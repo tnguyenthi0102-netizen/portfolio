@@ -1,6 +1,4 @@
-function NotFound() {
-  return <h1>Not Found</h1>
-}
+import NotFound from '@/components/NotFound'
 
 export default NotFound
 
