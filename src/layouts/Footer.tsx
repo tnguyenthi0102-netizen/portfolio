@@ -1,9 +1,12 @@
 function Footer() {
   return (
-    <footer className="border-t border-[--color-border] bg-[--color-card]">
-      <div className="mx-auto max-w-7xl px-4 py-6 text-[--text-xs] text-[--color-muted]">
-        © {new Date().getFullYear()} S5Tech Warrior — Built with React, TypeScript, Tailwind
-      </div>
+    <footer className="mb-10 px-4 text-center text-gray-500 dark:text-gray-400">
+      <small className="mb-2 block text-[--text-xs]">
+        &copy; {new Date().getFullYear()} Trang. All rights reserved.
+      </small>
+      <p className="text-[--text-xs]">
+        <span className="font-semibold">About this website:</span> built with React & Vite, TypeScript, Tailwind CSS, Vercel hosting.
+      </p>
     </footer>
   )
 }
