@@ -1,4 +1,4 @@
-import { projectsData } from '@/data/data'
+import { projectsData } from '@/data/portfolio'
 import Card from '@/components/ui/Card'
 import { cn } from '@/lib/cn'
 import Tag from '@/components/ui/Tag'

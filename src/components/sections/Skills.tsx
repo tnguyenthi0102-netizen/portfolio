@@ -13,7 +13,7 @@ function SkillsSection() {
           <li key={index}>
             <Tag
               text={skill}
-              className="bg-[var(--color-border)] text-[var(--color-fg)] tracking-wider py-1.5 rounded-[4px]"
+              className="bg-[var(--color-border)] text-[var(--color-fg)] tracking-wider py-1.5 rounded-[4px] shadow-sm"
               size="md"
             />
           </li>

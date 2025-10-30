@@ -37,7 +37,7 @@ export const experiencesData: ExperienceItem[] = [
     date: '2016 - 2019',
   },
   {
-    title: 'Frontend Lead',
+    title: 'Frontend Developer',
     location: 'SmartUp',
     description:
       'Led frontend architecture and development for E-Learning platform. Delivered production-ready features for multi-client facing applications using React/React Native.',

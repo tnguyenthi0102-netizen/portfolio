@@ -30,8 +30,8 @@
   --color-bg: #111827;
   --color-fg: #f9fafb;
   --color-muted: #9ca3af;
-  --color-border: #374151;
-  --color-card: #1f2937;
+  --color-border: #5b5c5d;
+  --color-card: #717172;
   --color-accent: #818cf8;
   --color-accent-fg: #ffffff;
   color-scheme: dark;
@@ -40,7 +40,7 @@
 /* base styles */
 @layer base {
   html, body, #root { height: 100%; }
-  body { @apply bg-[--color-bg] text-[--color-fg]; }
+  body { @apply bg-[var(--color-bg)] text-[var(--color-fg)]; }
 }
 
 

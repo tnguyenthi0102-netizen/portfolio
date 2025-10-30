@@ -13,9 +13,10 @@ function Hero() {
       </div>
 
       <h1 className="mb-10 mt-4 px-4 text-[--text-2xl] sm:text-[--text-4xl] font-medium !leading-[1.5]">
-        <span className="font-bold">Hello, I'm Trang Nguyen.</span> I'm a{' '}
-        <span className="font-bold">Senior JavaScript Developer</span> with{' '}
-        <span className="font-bold">10+ years</span> of experience. I enjoy building{' '}
+        <span className="font-bold">Hello, I'm Min.</span> <br /> I'm a{' '}
+        <span className="font-bold">JavaScript Developer.</span> <br />
+        I<span className="font-bold"> enjoy </span> 
+        <span className="font-bold">building</span> {' '}
         <span className="italic">web & mobile apps</span>. My focus is{' '}
         <span className="underline">React/React Native</span>.
       </h1>
