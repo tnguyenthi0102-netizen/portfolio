@@ -1,5 +1,16 @@
-function Card() {
-  return <div className="rounded-xl border border-[--color-border] bg-[--color-card] p-6 text-[--color-fg]">Card</div>
+import type { ReactNode } from 'react'
+
+type CardProps = {
+  children: ReactNode
+  className?: string
+}
+
+function Card({ children, className = '' }: CardProps) {
+  return (
+    <div className={`rounded-xl border border-[var(--color-border)] p-6 text-[var(--color-fg)] ${className}`}>
+      {children}
+    </div>
+  )
 }
 
 export default Card
