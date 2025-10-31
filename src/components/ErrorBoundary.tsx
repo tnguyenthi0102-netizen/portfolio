@@ -1,4 +1,6 @@
-import { Component, ReactNode } from 'react'
+import { Component } from 'react'
+import type { ReactNode } from 'react'
+import ErrorScreen from '@/components/ErrorScreen'
 
 interface Props {
   children: ReactNode
@@ -26,20 +28,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || (
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="text-center">
-            <h1 className="text-[--text-2xl] font-bold mb-2 text-[--color-fg]">Something went wrong</h1>
-            <p className="text-[--color-muted] mb-4">{this.state.error?.message || 'An unexpected error occurred'}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 rounded-md border border-[--color-border] bg-[--color-card] text-[--color-fg] hover:bg-[--color-border]/20"
-            >
-              Reload Page
-            </button>
-          </div>
-        </div>
-      )
+      return this.props.fallback || <ErrorScreen message={this.state.error?.message} />
     }
 
     return this.props.children
