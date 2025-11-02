@@ -4,7 +4,7 @@ import { calculateProgress } from '@/utils/achievement'
 
 export async function getAchievements(params: AchievementListParams = {}): Promise<AchievementListResponse> {
   const queryParams: Record<string, string> = {}
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       queryParams[key] = value.toString()
@@ -12,35 +12,8 @@ export async function getAchievements(params: AchievementListParams = {}): Promi
   })
 
   const queryString = new URLSearchParams(queryParams).toString()
-
-  const response = await api.get<any>(`?${queryString}`)
-
-  let data: Achievement[] = []
-  let pagination: Partial<AchievementListResponse> = {}
-  
-  if (Array.isArray(response.data)) {
-    data = response.data
-  } else if (response.data) {
-    if (Array.isArray(response.data.data)) {
-      data = response.data.data
-    } else if (Array.isArray(response.data.achievements)) {
-      data = response.data.achievements
-    }
-    
-    pagination = {
-      first: response.data.first,
-      items: response.data.items,
-      last: response.data.last,
-      next: response.data.next,
-      pages: response.data.pages,
-      prev: response.data.prev,
-    }
-  }
-
-  return {
-    data,
-    ...pagination,
-  }
+  const { data } = await api.get<any>(`?${queryString}`)
+  return data
 }
 
 export async function getAchievement(id: string): Promise<Achievement> {

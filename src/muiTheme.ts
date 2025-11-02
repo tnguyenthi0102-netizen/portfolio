@@ -24,7 +24,6 @@ export function getMuiTheme(isDark: boolean) {
       divider: colors.border,
     },
     typography: {
-      fontFamily: themeConfig.fontFamily.sans.join(','),
       fontSize: 16,
     },
     components: {
@@ -59,9 +58,7 @@ export function getMuiTheme(isDark: boolean) {
             '&:hover .MuiOutlinedInput-notchedOutline': {
               borderColor: colors.border,
             },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderWidth: 0,
-            },
+
           },
         },
       },
@@ -100,46 +97,12 @@ export function getMuiTheme(isDark: boolean) {
           root: {
             '&.MuiPickersTextField-root .MuiPickersInputBase-root': {
               backgroundColor: colors.bg,
-              // border: 'none'
             },
 
           },
         },
       },
-      MuiTableHead: {
-        styleOverrides: {
-          root: {
-            '& .MuiTableCell-head': {
-              color: colors.fg,
-              borderColor: colors.border,
-            },
-          },
-        },
-      },
-      MuiTableCell: {
-        styleOverrides: {
-          root: {
-            borderColor: colors.border,
-            color: colors.fg,
-          },
-        },
-      },
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            backgroundColor: colors.card,
-            color: colors.fg,
-          },
-        },
-      },
-      MuiDialog: {
-        styleOverrides: {
-          paper: {
-            backgroundColor: colors.bg,
-            color: colors.fg,
-          },
-        },
-      },
+      
     },
   })
 }

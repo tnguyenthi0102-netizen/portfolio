@@ -88,7 +88,7 @@ function TodoItemRow(props: TodoItemRowProps) {
   const { index, control, register, errors, onRemove } = props
 
   const content = (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
       <Controller
         name={`todos.${index}.done`}
         control={control}
@@ -106,6 +106,7 @@ function TodoItemRow(props: TodoItemRowProps) {
         placeholder={`Todo #${index + 1}`}
         size="small"
         fullWidth
+        sx={{ flex: 1, minWidth: 0 }}
         error={!!errors.todos?.[index]?.title}
         helperText={errors.todos?.[index]?.title?.message}
         onClick={(e) => e.stopPropagation()}
@@ -141,6 +142,7 @@ function TodoItemRow(props: TodoItemRowProps) {
         bgcolor: 'action.hover',
         p: 1,
         borderRadius: 1,
+        width: '100%',
       }}
     >
       {content}

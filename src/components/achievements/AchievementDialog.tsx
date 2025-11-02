@@ -19,7 +19,7 @@ import {
   Divider,
 } from '@mui/material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { achievementSchema, type AchievementFormData, areValuesEqual } from '@/utils/achievement'
+import { achievementSchema, type AchievementFormData, areValuesEqual, filterValidTodos } from '@/utils/achievement'
 import { createAchievement, updateAchievement } from '@/services/achievements'
 import { toast } from 'sonner'
 import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
@@ -93,7 +93,7 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
           title: data.title,
           description: data.description,
           category: data.category,
-          todos: data.todos.map(todo => ({
+          todos: filterValidTodos(data.todos).map(todo => ({
             ...todo,
             id: typeof todo.id === 'number' ? todo.id : Date.now(),
           })),
@@ -107,7 +107,7 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
           category: data.category,
           status: 'pending',
           score: 0,
-          todos: data.todos.map(todo => ({
+          todos: filterValidTodos(data.todos).map(todo => ({
             id: typeof todo.id === 'number' ? todo.id : Date.now(),
             title: todo.title,
             done: todo.done ?? false,

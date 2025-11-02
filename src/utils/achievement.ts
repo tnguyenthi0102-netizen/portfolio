@@ -22,6 +22,10 @@ export function calculateProgress(todos?: TodoItem[]): number {
   return Math.round((completedCount / todos.length) * 100)
 }
 
+export function filterValidTodos<T extends { title?: string }>(todos: T[]): T[] {
+  return todos.filter(todo => todo.title && todo.title.trim() !== '')
+}
+
 type TodoComparable = {
   title: string
   done: boolean

@@ -29,7 +29,7 @@ import { updateAchievement, deleteAchievement } from '@/services/achievements'
 import { toast } from 'sonner'
 import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-import { areValuesEqual } from '@/utils/achievement'
+import { areValuesEqual, filterValidTodos } from '@/utils/achievement'
 import TodoItemRow from './TodoItemRow'
 
 interface AchievementTableProps {
@@ -117,7 +117,7 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
         title: editingData.title,
         description: editingData.description,
         category: editingData.category,
-        todos: editingData.todos,
+        todos: editingData.todos ? filterValidTodos(editingData.todos) : undefined,
       })
       toast.success('Achievement updated successfully')
       setEditingId(null)

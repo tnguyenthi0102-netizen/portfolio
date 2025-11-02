@@ -136,7 +136,7 @@ function Achievements() {
 
       {loading ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <CircularProgress />
+          <CircularProgress color="success" />
         </Paper>
       ) : (
         <>
