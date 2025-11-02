@@ -22,7 +22,7 @@ import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
 
 function AchievementToolbar() {
   const [search, setSearch] = useQueryStates({
-    search: parseAsString.withDefault(''),
+    q: parseAsString.withDefault(''),
     category: parseAsString,
     updatedFrom: parseAsString,
     updatedTo: parseAsString,
@@ -32,7 +32,7 @@ function AchievementToolbar() {
     limit: parseAsString.withDefault('10'),
   })
 
-  const [localSearch, setLocalSearch] = useState(search.search || '')
+  const [localSearch, setLocalSearch] = useState(search.q || '')
   const [localCategory, setLocalCategory] = useState(search.category || '')
   const [localProgressRange, setLocalProgressRange] = useState<[number, number]>([
     search.progressMin ?? 0,
@@ -58,14 +58,6 @@ function AchievementToolbar() {
     ])
   }, [search.progressMin, search.progressMax])
 
-  useEffect(() => {
-    setLocalSearch(search.search || '')
-  }, [search.search])
-
-  useEffect(() => {
-    setLocalCategory(search.category || '')
-  }, [search.category])
-
   const handleDateRangeChange = (newValue: [Dayjs | null, Dayjs | null] | null) => {
     if (newValue) {
       setDateRange(newValue)
@@ -76,9 +68,9 @@ function AchievementToolbar() {
 
   const handleReset = () => {
     setSearch({
-      search: '',
+      q: '',
       category: null,
-    
+
       updatedFrom: null,
       updatedTo: null,
       progressMin: null,
@@ -93,7 +85,7 @@ function AchievementToolbar() {
 
   const handleApplyFilters = () => {
     setSearch({
-      search: localSearch || '',
+      q: localSearch || '',
       category: localCategory && localCategory !== '' ? localCategory : null,
       updatedFrom: dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : null,
       updatedTo: dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : null,
@@ -102,14 +94,14 @@ function AchievementToolbar() {
       page: '1',
     })
   }
-
+ 
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
       <Stack spacing={2}>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
           <TextField
             fullWidth
-            placeholder="Search..."
+            placeholder="Search by keyword..."
             value={localSearch}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
             size="small"
@@ -136,7 +128,7 @@ function AchievementToolbar() {
               value={localCategory}
               label="Category"
               onChange={(e) => setLocalCategory(e.target.value as string)}
-              renderValue={(value) => (value === '' ? 'All' : value)}
+              renderValue={(value) => (value || 'All')}
             >
               <MenuItem value="">
                 <em>All</em>
@@ -158,16 +150,13 @@ function AchievementToolbar() {
                 size: 'small',
                 sx: {
                   minWidth: { xs: '100%', sm: 360 },
-                  '& .MuiInputBase-root': {
-                    backgroundColor: 'red',
-                  },
                 },
               },
             }}
           />
         </Stack>
 
-        <Box>
+        <Box sx={{ paddingTop: 5 }}>
 
           <Slider
             color='success'
@@ -186,17 +175,12 @@ function AchievementToolbar() {
 
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           <Button
-            variant="contained"
+          color='primary'
+            variant="outlined"
             onClick={handleReset}
             sx={{
-              minWidth: 120,
-              height: '40px',
-              backgroundColor: 'var(--color-border)',
+              borderColor: 'var(--color-border)',
               color: 'var(--color-fg)',
-              '&:hover': {
-                backgroundColor: 'var(--color-border)',
-                opacity: 0.8,
-              },
             }}
           >
             Reset
@@ -205,14 +189,8 @@ function AchievementToolbar() {
             variant="contained"
             onClick={handleApplyFilters}
             sx={{
-              minWidth: 120,
-              height: '40px',
               backgroundColor: 'var(--color-border)',
               color: 'var(--color-fg)',
-              '&:hover': {
-                backgroundColor: 'var(--color-border)',
-                opacity: 0.8,
-              },
             }}
           >
             Filter

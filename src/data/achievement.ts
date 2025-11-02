@@ -30,7 +30,7 @@ export interface AchievementUpdateInput {
 }
 
 export interface AchievementFilters {
-  search?: string
+  q?: string
   category?: string[]
   progressMin?: number
   progressMax?: number
@@ -42,7 +42,7 @@ export interface AchievementListParams {
   _page?: number
   _per_page?: number
   _sort?: string
-  title_like?: string
+  q?: string
   category?: string
   progress_gte?: number
   progress_lte?: number

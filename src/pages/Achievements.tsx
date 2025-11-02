@@ -14,7 +14,7 @@ function Achievements() {
   const [query, setQuery] = useQueryStates({
     page: parseAsInteger.withDefault(1),
     limit: parseAsInteger.withDefault(10),
-    search: parseAsString,
+    q: parseAsString,
     sortBy: parseAsString.withDefault('updatedAt'),
     order: parseAsString.withDefault('desc'),
     category: parseAsString,
@@ -52,7 +52,7 @@ function Achievements() {
       const order = (query.order as 'asc' | 'desc') || 'desc'
       params._sort = order === 'asc' ? sortBy : `-${sortBy}`
 
-      if (query.search) params.title_like = query.search
+      if (query.q) params.q = query.q
       if (query.category) params.category = query.category
       if (query.updatedFrom) {
         const dateFrom = new Date(query.updatedFrom + 'T00:00:00').getTime() / 1000
@@ -85,7 +85,7 @@ function Achievements() {
 
   useEffect(() => {
     fetchAchievements()
-  }, [query.page, query.limit, query.search, query.sortBy, query.order, query.category, query.updatedFrom, query.updatedTo, query.progressMin, query.progressMax])
+  }, [query.page, query.q, query.category, query.updatedFrom, query.updatedTo, query.progressMin, query.progressMax])
 
   const handleCreate = () => {
     setEditingAchievement(null)

@@ -74,6 +74,24 @@ export function getMuiTheme(isDark: boolean) {
             '& .MuiInputLabel-root': {
               color: colors.muted,
             },
+            '& .MuiInputLabel-root.Mui-focused': {
+              color: colors.muted,
+            },
+            '& .MuiInputLabel-root.MuiInputLabel-shrink': {
+              color: colors.muted,
+            },
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            '&.Mui-focused': {
+              color: colors.muted,
+            },
+            '&.MuiInputLabel-shrink.Mui-focused': {
+              color: colors.muted,
+            },
           },
         },
       },

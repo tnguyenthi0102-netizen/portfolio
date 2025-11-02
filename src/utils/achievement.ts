@@ -22,3 +22,39 @@ export function calculateProgress(todos?: TodoItem[]): number {
   return Math.round((completedCount / todos.length) * 100)
 }
 
+type TodoComparable = {
+  title: string
+  done: boolean
+  id?: string | number
+}
+
+type AchievementComparable = {
+  title?: string
+  description?: string
+  category?: string
+  todos?: TodoComparable[]
+}
+
+export function areValuesEqual(
+  val1: AchievementComparable,
+  val2: AchievementComparable
+): boolean {
+  if (val1.title !== val2.title) return false
+  if (val1.description !== val2.description) return false
+  if (val1.category !== val2.category) return false
+
+  const todos1 = val1.todos || []
+  const todos2 = val2.todos || []
+  if (todos1.length !== todos2.length) return false
+
+  for (let i = 0; i < todos1.length; i++) {
+    const todo1 = todos1[i]
+    const todo2 = todos2[i]
+    if (todo1.title !== todo2.title || todo1.done !== todo2.done) {
+      return false
+    }
+  }
+
+  return true
+}
+

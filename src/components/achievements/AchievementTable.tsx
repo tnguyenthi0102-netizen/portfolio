@@ -16,7 +16,6 @@ import {
   Typography,
   CircularProgress,
   Menu,
-  Checkbox,
   Slider,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
@@ -30,6 +29,8 @@ import { updateAchievement, deleteAchievement } from '@/services/achievements'
 import { toast } from 'sonner'
 import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import { areValuesEqual } from '@/utils/achievement'
+import TodoItemRow from './TodoItemRow'
 
 interface AchievementTableProps {
   achievements: Achievement[]
@@ -53,26 +54,6 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
   const [todosMenuAnchor, setTodosMenuAnchor] = useState<{ id: string; element: HTMLElement } | null>(null)
-
-  const areValuesEqual = (data1: Partial<Achievement>, data2: Partial<Achievement>): boolean => {
-    if (data1.title !== data2.title) return false
-    if (data1.description !== data2.description) return false
-    if (data1.category !== data2.category) return false
-    
-    const todos1 = data1.todos || []
-    const todos2 = data2.todos || []
-    if (todos1.length !== todos2.length) return false
-    
-    for (let i = 0; i < todos1.length; i++) {
-      const todo1 = todos1[i]
-      const todo2 = todos2[i]
-      if (todo1.title !== todo2.title || todo1.done !== todo2.done) {
-        return false
-      }
-    }
-    
-    return true
-  }
 
   const handleStartEdit = (achievement: Achievement) => {
     setEditingId(achievement.id)
@@ -272,33 +253,15 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
                         >
                           {editingData.todos && editingData.todos.length > 0 ? (
                             editingData.todos.map((todo) => (
-                              <MenuItem key={todo.id} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', p: 1 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Checkbox
-                                    checked={todo.done}
-                                    onChange={() => handleToggleTodo(todo.id)}
-                                    size="small"
-                                    color="success"
-                                  />
-                                  <TextField
-                                    size="small"
-                                    value={todo.title}
-                                    onChange={(e) => handleUpdateTodoTitle(todo.id, e.target.value)}
-                                    placeholder="Todo title"
-                                    fullWidth
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
-                                  <IconButton
-                                    size="small"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleRemoveTodo(todo.id)
-                                    }}
-                                  >
-                                    <DeleteIcon fontSize="small" color='error'/>
-                                  </IconButton>
-                                </Box>
-                              </MenuItem>
+                              <TodoItemRow
+                                key={todo.id}
+                                mode="controlled"
+                                todo={todo}
+                                onToggle={handleToggleTodo}
+                                onTitleChange={handleUpdateTodoTitle}
+                                onRemove={handleRemoveTodo}
+                                variant="menu"
+                              />
                             ))
                           ) : (
                             <MenuItem disabled>No todos</MenuItem>

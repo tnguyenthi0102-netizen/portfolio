@@ -13,19 +13,18 @@ import {
   Select,
   MenuItem,
   Box,
-  Alert,
+  FormHelperText,
   IconButton,
-  Checkbox,
   Typography,
   Divider,
 } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { achievementSchema, type AchievementFormData } from '@/utils/achievement'
+import { achievementSchema, type AchievementFormData, areValuesEqual } from '@/utils/achievement'
 import { createAchievement, updateAchievement } from '@/services/achievements'
 import { toast } from 'sonner'
 import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
 import type { Achievement } from '@/data/achievement'
+import TodoItemRow from './TodoItemRow'
 
 interface AchievementDialogProps {
   open: boolean
@@ -59,26 +58,6 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
   })
 
   console.log(errors)
-
-  const areValuesEqual = (val1: AchievementFormData, val2: AchievementFormData): boolean => {
-    if (val1.title !== val2.title) return false
-    if (val1.description !== val2.description) return false
-    if (val1.category !== val2.category) return false
-    
-    const todos1 = val1.todos || []
-    const todos2 = val2.todos || []
-    if (todos1.length !== todos2.length) return false
-    
-    for (let i = 0; i < todos1.length; i++) {
-      const todo1 = todos1[i]
-      const todo2 = todos2[i]
-      if (todo1.title !== todo2.title || todo1.done !== todo2.done) {
-        return false
-      }
-    }
-    
-    return true
-  }
 
   useEffect(() => {
     if (achievement) {
@@ -115,9 +94,8 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
           description: data.description,
           category: data.category,
           todos: data.todos.map(todo => ({
+            ...todo,
             id: typeof todo.id === 'number' ? todo.id : Date.now(),
-            title: todo.title,
-            done: todo.done ?? false,
           })),
         }
         await updateAchievement(achievement.id, normalizedData)
@@ -176,9 +154,7 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
                 )}
               />
               {errors.category && (
-                <Alert severity="error" sx={{ mt: 0.5 }}>
-                  {errors.category.message}
-                </Alert>
+                <FormHelperText>{errors.category.message}</FormHelperText>
               )}
             </FormControl>
             <TextField
@@ -190,7 +166,7 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
               error={!!errors.description}
               helperText={errors.description?.message}
             />
-            
+
 
             <Divider sx={{ my: 2 }} />
 
@@ -202,11 +178,6 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
                   size="small"
                   color="success"
                   onClick={() => append({ title: '', done: false })}
-                  sx={{
-                    '& .MuiSvgIcon-root': {
-                      fontSize: '1.5rem',
-                    },
-                  }}
                 >
                   <AddCircleIcon />
                 </IconButton>
@@ -219,55 +190,27 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
               )}
 
               {fields.map((field, index) => (
-                <Box
+                <TodoItemRow
                   key={field.id}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    mb: 1,
-                    bgcolor: 'action.hover',
-                    p: 1,
-                    borderRadius: 1,
-                  }}
-                >
-                  <Controller
-                    name={`todos.${index}.done`}
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox
-                        {...field}
-                        checked={field.value}
-                        onChange={(e) => field.onChange(e.target.checked)}
-                        color="success"
-                      />
-                    )}
-                  />
-
-                  <TextField
-                    {...register(`todos.${index}.title` as const)}
-                    placeholder={`Todo #${index + 1}`}
-                    size="small"
-                    fullWidth
-                    error={!!errors.todos?.[index]?.title}
-                    helperText={errors.todos?.[index]?.title?.message}
-                  />
-
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => remove(index)}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Box>
+                  mode="form"
+                  index={index}
+                  control={control}
+                  register={register}
+                  errors={errors}
+                  onRemove={() => remove(index)}
+                  variant="form"
+                />
               ))}
             </Box>
           </Box>
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
+        <DialogActions sx={{ padding: 3 }}>
+          <Button onClick={onClose} variant="outlined"
+            sx={{
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-fg)',
+            }}>Cancel</Button>
           <Button type="submit" variant="contained" disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : achievement ? 'Update' : 'Create'}
           </Button>

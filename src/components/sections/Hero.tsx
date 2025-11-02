@@ -5,7 +5,7 @@ function Hero() {
         <div className="relative">
           <img
             src="https://avatars.githubusercontent.com/u/9919?v=4"
-            alt="Trang Nguyen portrait"
+            alt="Min portrait"
             className="h-24 w-24 rounded-full object-cover border-[0.35rem] border-[--color-card] shadow-xl"
           />
           <span className="absolute bottom-0 right-0 text-4xl animate-wave origin-bottom-right">👋</span>
