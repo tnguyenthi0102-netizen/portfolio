@@ -12,7 +12,10 @@ import {
   Slider,
   Typography,
   Box,
+  InputAdornment,
+  IconButton,
 } from '@mui/material'
+import ClearIcon from '@mui/icons-material/Clear'
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker'
 import dayjs, { Dayjs } from 'dayjs'
 import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
@@ -55,6 +58,14 @@ function AchievementToolbar() {
     ])
   }, [search.progressMin, search.progressMax])
 
+  useEffect(() => {
+    setLocalSearch(search.search || '')
+  }, [search.search])
+
+  useEffect(() => {
+    setLocalCategory(search.category || '')
+  }, [search.category])
+
   const handleDateRangeChange = (newValue: [Dayjs | null, Dayjs | null] | null) => {
     if (newValue) {
       setDateRange(newValue)
@@ -83,7 +94,7 @@ function AchievementToolbar() {
   const handleApplyFilters = () => {
     setSearch({
       search: localSearch || '',
-      category: localCategory ? localCategory : null,
+      category: localCategory && localCategory !== '' ? localCategory : null,
       updatedFrom: dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : null,
       updatedTo: dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : null,
       progressMin: localProgressRange[0] !== 0 ? localProgressRange[0] : null,
@@ -102,6 +113,19 @@ function AchievementToolbar() {
             value={localSearch}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
             size="small"
+            InputProps={{
+              endAdornment: localSearch ? (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setLocalSearch('')}
+                    edge="end"
+                    size="small"
+                  >
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            }}
           />
         </Stack>
 
@@ -112,6 +136,7 @@ function AchievementToolbar() {
               value={localCategory}
               label="Category"
               onChange={(e) => setLocalCategory(e.target.value as string)}
+              renderValue={(value) => (value === '' ? 'All' : value)}
             >
               <MenuItem value="">
                 <em>All</em>

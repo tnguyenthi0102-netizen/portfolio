@@ -20,7 +20,7 @@ import {
   Divider,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import AddIcon from '@mui/icons-material/Add'
+import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { achievementSchema, type AchievementFormData } from '@/utils/achievement'
 import { createAchievement, updateAchievement } from '@/services/achievements'
 import { toast } from 'sonner'
@@ -200,10 +200,15 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
                 <Typography variant="subtitle1">Todos</Typography>
                 <IconButton
                   size="small"
-                  color="primary"
+                  color="success"
                   onClick={() => append({ title: '', done: false })}
+                  sx={{
+                    '& .MuiSvgIcon-root': {
+                      fontSize: '1.5rem',
+                    },
+                  }}
                 >
-                  <AddIcon fontSize="small" />
+                  <AddCircleIcon />
                 </IconButton>
               </Box>
 

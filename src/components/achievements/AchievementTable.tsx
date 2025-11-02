@@ -37,6 +37,15 @@ interface AchievementTableProps {
   onEdit: (achievement: Achievement) => void
 }
 
+const textTwoLineStyle = {
+  display: '-webkit-box',
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: 'vertical' as const,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  wordBreak: 'break-word' as const,
+}
+
 function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingData, setEditingData] = useState<Partial<Achievement>>({})
@@ -202,7 +211,9 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
                         fullWidth
                       />
                     ) : (
-                      <Typography variant="body2">{achievement.title}</Typography>
+                      <Typography variant="body2" sx={textTwoLineStyle}>
+                        {achievement.title}
+                      </Typography>
                     )}
                   </TableCell>
                   <TableCell>
@@ -216,7 +227,9 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
                         maxRows={2}
                       />
                     ) : (
-                      <Typography variant="body2">{achievement.description}</Typography>
+                      <Typography variant="body2" sx={textTwoLineStyle}>
+                        {achievement.description}
+                      </Typography>
                     )}
                   </TableCell>
                   <TableCell>

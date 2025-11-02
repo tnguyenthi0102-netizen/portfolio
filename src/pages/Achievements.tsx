@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs'
 import { Toaster } from 'sonner'
 import { Container, Box, Typography, Button, Paper, Pagination, Stack, CircularProgress } from '@mui/material'
@@ -40,7 +40,7 @@ function Achievements() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null)
 
-  const fetchAchievements = useCallback(async () => {
+  const fetchAchievements = async () => {
     try {
       setLoading(true)
       const params: AchievementListParams = {
@@ -52,7 +52,7 @@ function Achievements() {
       const order = (query.order as 'asc' | 'desc') || 'desc'
       params._sort = order === 'asc' ? sortBy : `-${sortBy}`
 
-      if (query.search) params.q = query.search
+      if (query.search) params.title_like = query.search
       if (query.category) params.category = query.category
       if (query.updatedFrom) {
         const dateFrom = new Date(query.updatedFrom + 'T00:00:00').getTime() / 1000
@@ -81,11 +81,11 @@ function Achievements() {
     } finally {
       setLoading(false)
     }
-  }, [query.page, query.limit, query.search, query.sortBy, query.order, query.category, query.updatedFrom, query.updatedTo, query.progressMin, query.progressMax])
+  }
 
   useEffect(() => {
     fetchAchievements()
-  }, [fetchAchievements])
+  }, [query.page, query.limit, query.search, query.sortBy, query.order, query.category, query.updatedFrom, query.updatedTo, query.progressMin, query.progressMax])
 
   const handleCreate = () => {
     setEditingAchievement(null)

@@ -82,7 +82,7 @@ export function getMuiTheme(isDark: boolean) {
           root: {
             '&.MuiPickersTextField-root .MuiPickersInputBase-root': {
               backgroundColor: colors.bg,
-              border: 'none'
+              // border: 'none'
             },
 
           },

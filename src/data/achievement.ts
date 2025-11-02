@@ -9,8 +9,6 @@ export interface Achievement {
   title: string
   description: string
   category: string
-  status: string
-  score: number
   progress?: number
   todos?: TodoItem[]
   createdAt: number
@@ -21,8 +19,6 @@ export interface AchievementCreateInput {
   title: string
   description: string
   category: string
-  status: string
-  score: number
   todos?: TodoItem[]
 }
 
@@ -30,21 +26,14 @@ export interface AchievementUpdateInput {
   title?: string
   description?: string
   category?: string
-  status?: string
-  score?: number
   todos?: TodoItem[]
 }
 
 export interface AchievementFilters {
   search?: string
   category?: string[]
-  status?: string[]
-  scoreMin?: number
-  scoreMax?: number
   progressMin?: number
   progressMax?: number
-  createdFrom?: string
-  createdTo?: string
   updatedFrom?: string
   updatedTo?: string
 }
@@ -53,7 +42,7 @@ export interface AchievementListParams {
   _page?: number
   _per_page?: number
   _sort?: string
-  q?: string
+  title_like?: string
   category?: string
   progress_gte?: number
   progress_lte?: number
