@@ -4,6 +4,9 @@ import '@/styles/index.css'
 import App from '@/App.tsx'
 import { Provider } from 'react-redux'
 import { store } from '@/store'
+import { initTheme } from '@/theme'
+
+initTheme()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

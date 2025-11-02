@@ -2,7 +2,7 @@ function AboutSection() {
   return (
     <section
       id="about"
-      className="max-w-[45rem] text-center leading-8 sm:mb-40 scroll-mt-28"
+      className="max-w-[45rem] text-center leading-8 sm:mb-20 scroll-mt-28"
     >
       <h2 className="text-[--text-3xl] font-medium capitalize mb-8 text-center">About me</h2>
       <p className="mb-3">

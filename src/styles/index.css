@@ -1,46 +1,25 @@
 @import "tailwindcss";
 
 /* Theme tokens using Tailwind v4 @theme */
-@theme {
-  /* typography (responsive via clamp) */
-  --text-xs: clamp(0.75rem, 0.71rem + 0.19vw, 0.8rem);
-  --text-sm: clamp(0.875rem, 0.84rem + 0.23vw, 0.95rem);
-  --text-base: clamp(1rem, 0.95rem + 0.27vw, 1.1rem);
-  --text-lg: clamp(1.125rem, 1.06rem + 0.35vw, 1.3rem);
-  --text-xl: clamp(1.25rem, 1.15rem + 0.46vw, 1.6rem);
-  --text-2xl: clamp(1.5rem, 1.35rem + 0.73vw, 2rem);
-  --text-3xl: clamp(1.875rem, 1.63rem + 1.23vw, 2.5rem);
-  --text-4xl: clamp(2.25rem, 1.92rem + 1.64vw, 3rem);
-}
 
-:root {
-  /* Light theme colors */
-  --color-bg: #ffffff;
-  --color-fg: #1f2937;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
-  --color-card: #f9fafb;
-  --color-accent: #6366f1;
-  --color-accent-fg: #ffffff;
-  color-scheme: light;
-}
-
-.dark {
-  /* dark overrides */
-  --color-bg: #111827;
-  --color-fg: #f9fafb;
-  --color-muted: #9ca3af;
-  --color-border: #5b5c5d;
-  --color-card: #717172;
-  --color-accent: #818cf8;
-  --color-accent-fg: #ffffff;
-  color-scheme: dark;
-}
+/* placeholders to document variables are set at runtime */
 
 /* base styles */
 @layer base {
   html, body, #root { height: 100%; }
-  body { @apply bg-[var(--color-bg)] text-[var(--color-fg)]; }
+  body { background-color: var(--color-bg); color: var(--color-fg); }
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(20deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
 }
 
 

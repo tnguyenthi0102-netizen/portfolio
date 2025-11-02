@@ -19,9 +19,6 @@ export default function Tag({
   size = "md",
   className = "",
 }: TagProps) {
-  const borderRadiusValue =
-    typeof borderRadius === "number" ? `${borderRadius}px` : borderRadius;
-
   return (
     <span
       className={cn(
@@ -29,13 +26,6 @@ export default function Tag({
         sizeStyles[size],
         className
       )}
-      style={
-        borderRadiusValue !== undefined
-          ? {
-              borderRadius: borderRadiusValue,
-            }
-          : undefined
-      }
     >
       {text}
     </span>

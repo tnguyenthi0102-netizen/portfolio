@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useEffect, useRef } from 'react'
+import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
@@ -14,11 +14,17 @@ import {
   MenuItem,
   Box,
   Alert,
+  IconButton,
+  Checkbox,
+  Typography,
+  Divider,
 } from '@mui/material'
-import { achievementSchema, type AchievementFormData } from '@/lib/validation/achievement'
-import { createAchievement, updateAchievement } from '@/lib/api/achievements'
+import DeleteIcon from '@mui/icons-material/Delete'
+import AddIcon from '@mui/icons-material/Add'
+import { achievementSchema, type AchievementFormData } from '@/utils/achievement'
+import { createAchievement, updateAchievement } from '@/services/achievements'
 import { toast } from 'sonner'
-import { ACHIEVEMENT_CATEGORIES, ACHIEVEMENT_STATUSES } from '@/data/achievement-constants'
+import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
 import type { Achievement } from '@/data/achievement'
 
 interface AchievementDialogProps {
@@ -41,38 +47,95 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
       title: '',
       description: '',
       category: '',
-      status: '',
-      score: 0,
+      todos: [],
     },
   })
 
+  const initialValuesRef = useRef<AchievementFormData | null>(null)
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'todos',
+  })
+
+  console.log(errors)
+
+  const areValuesEqual = (val1: AchievementFormData, val2: AchievementFormData): boolean => {
+    if (val1.title !== val2.title) return false
+    if (val1.description !== val2.description) return false
+    if (val1.category !== val2.category) return false
+    
+    const todos1 = val1.todos || []
+    const todos2 = val2.todos || []
+    if (todos1.length !== todos2.length) return false
+    
+    for (let i = 0; i < todos1.length; i++) {
+      const todo1 = todos1[i]
+      const todo2 = todos2[i]
+      if (todo1.title !== todo2.title || todo1.done !== todo2.done) {
+        return false
+      }
+    }
+    
+    return true
+  }
+
   useEffect(() => {
     if (achievement) {
-      reset({
+      const initialValues: AchievementFormData = {
         title: achievement.title,
         description: achievement.description,
         category: achievement.category,
-        status: achievement.status,
-        score: achievement.score,
-      })
+        todos: achievement.todos || [],
+      }
+      initialValuesRef.current = initialValues
+      reset(initialValues)
     } else {
-      reset({
+      const emptyValues: AchievementFormData = {
         title: '',
         description: '',
         category: '',
-        status: '',
-        score: 0,
-      })
+        todos: [],
+      }
+      initialValuesRef.current = null
+      reset(emptyValues)
     }
   }, [achievement, reset, open])
 
   const onSubmit = async (data: AchievementFormData) => {
     try {
       if (achievement) {
-        await updateAchievement(achievement.id, data)
+        if (initialValuesRef.current && areValuesEqual(data, initialValuesRef.current)) {
+          toast.info('No changes to save')
+          onClose()
+          return
+        }
+        const normalizedData = {
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          todos: data.todos.map(todo => ({
+            id: typeof todo.id === 'number' ? todo.id : Date.now(),
+            title: todo.title,
+            done: todo.done ?? false,
+          })),
+        }
+        await updateAchievement(achievement.id, normalizedData)
         toast.success('Achievement updated successfully')
       } else {
-        await createAchievement(data)
+        const normalizedData = {
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          status: 'pending',
+          score: 0,
+          todos: data.todos.map(todo => ({
+            id: typeof todo.id === 'number' ? todo.id : Date.now(),
+            title: todo.title,
+            done: todo.done ?? false,
+          })),
+        }
+        await createAchievement(normalizedData)
         toast.success('Achievement created successfully')
       }
       onSuccess()
@@ -97,15 +160,6 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
               error={!!errors.title}
               helperText={errors.title?.message}
             />
-            <TextField
-              {...register('description')}
-              label="Description"
-              fullWidth
-              multiline
-              rows={3}
-              error={!!errors.description}
-              helperText={errors.description?.message}
-            />
             <FormControl fullWidth error={!!errors.category}>
               <InputLabel>Category</InputLabel>
               <Controller
@@ -127,29 +181,86 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
                 </Alert>
               )}
             </FormControl>
-            <FormControl fullWidth error={!!errors.status}>
-              <InputLabel>Status</InputLabel>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <Select {...field} label="Status">
-                    {ACHIEVEMENT_STATUSES.map((status) => (
-                      <MenuItem key={status} value={status}>
-                        {status}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-              {errors.status && (
-                <Alert severity="error" sx={{ mt: 0.5 }}>
-                  {errors.status.message}
-                </Alert>
+            <TextField
+              {...register('description')}
+              label="Description"
+              fullWidth
+              multiline
+              rows={3}
+              error={!!errors.description}
+              helperText={errors.description?.message}
+            />
+            
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* ----- TODOS SECTION ----- */}
+            <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Typography variant="subtitle1">Todos</Typography>
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={() => append({ title: '', done: false })}
+                >
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              </Box>
+
+              {fields.length === 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  No todos added
+                </Typography>
               )}
-            </FormControl>
+
+              {fields.map((field, index) => (
+                <Box
+                  key={field.id}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    mb: 1,
+                    bgcolor: 'action.hover',
+                    p: 1,
+                    borderRadius: 1,
+                  }}
+                >
+                  <Controller
+                    name={`todos.${index}.done`}
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        {...field}
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                        color="success"
+                      />
+                    )}
+                  />
+
+                  <TextField
+                    {...register(`todos.${index}.title` as const)}
+                    placeholder={`Todo #${index + 1}`}
+                    size="small"
+                    fullWidth
+                    error={!!errors.todos?.[index]?.title}
+                    helperText={errors.todos?.[index]?.title?.message}
+                  />
+
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => remove(index)}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              ))}
+            </Box>
           </Box>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" disabled={isSubmitting}>

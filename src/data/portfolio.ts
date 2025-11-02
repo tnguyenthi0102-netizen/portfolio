@@ -3,7 +3,6 @@ export const links = [
   { name: 'About', hash: '#about' },
   { name: 'Projects', hash: '#projects' },
   { name: 'Skills', hash: '#skills' },
-  { name: 'Experience', hash: '#experience' },
   { name: 'Contact', hash: '#contact' },
 ] as const
 
@@ -66,7 +65,7 @@ export const projectsData: Project[] = [
     description:
       'Built and maintained a social networking app with real-time chat, video calls (Agora SDK), and push notifications. Developed cross-platform mobile app using React Native and web version with Next.js, integrated GraphQL APIs and implemented WebSocket for real-time features.',
     tags: ['React JS', 'React Native', 'Next.js', 'Agora SDK', 'Socket', 'GraphQL'],
-    imageUrl: 'https://via.placeholder.com/600x400',
+    imageUrl: '/images/ylanes1.jpg',
     liveSite: 'https://landing-phi-rust.vercel.app/',
   },
   {
@@ -74,7 +73,7 @@ export const projectsData: Project[] = [
     description:
       'Developed frontend for staffing platform serving hospitality industry. Built responsive web and mobile apps using React/React Native, integrated with REST APIs, implemented real-time features and optimized user experience.',
     tags: ['React JS', 'React Native', 'REST API', 'TypeScript'],
-    imageUrl: 'https://via.placeholder.com/600x400',
+    imageUrl: '/images/snagashyft.png',
     liveSite: 'https://snagashyft.com/',
   },
   {
@@ -82,21 +81,21 @@ export const projectsData: Project[] = [
     description:
       'Architected and developed e-learning platform with React/React Native. Implemented push notifications, CI/CD pipeline, and successfully deployed to both App Store and Google Play Store. Built RESTful APIs and optimized app performance for educational content delivery.',
     tags: ['React JS', 'React Native', 'TypeScript', 'Push Notification', 'CI/CD', 'App Store Deployment', 'Google Play Store', 'REST API', 'E-Learning'],
-    imageUrl: 'https://via.placeholder.com/600x400',
+    imageUrl: '/images/smartup.png',
   },
   {
     title: 'PRISM',
     description:
       'Built interactive data analytics dashboards with advanced visualization features. Developed using Polymer framework and Groovy on Grails, implemented real-time data processing and created user-friendly interfaces for business intelligence.',
     tags: ['Polymer', 'Groovy on Grails', 'Analytics', 'Dashboard', 'Data Visualization', 'Interactive Charts'],
-    imageUrl: 'https://via.placeholder.com/600x400',
+    imageUrl: '/images/prism.png',
   },
   {
     title: 'TAMTAY',
     description:
       'Developed admin management system for gaming portal. Built admin dashboard using PHP backend to manage games, players, user accounts, and system configurations. Created responsive web interface for administrators to monitor and control the gaming platform.',
     tags: ['PHP', 'Admin Dashboard', 'Game Management', 'User Management', 'Gaming Portal'],
-    imageUrl: 'https://via.placeholder.com/600x400',
+    imageUrl: '/images/tamtay.png',
     liveSite: 'https://chanthapthanh.com/',
   },
 ]

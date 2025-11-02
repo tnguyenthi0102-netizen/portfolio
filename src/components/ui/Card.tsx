@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react'
+import { cn } from '@/lib/cn'
 
 type CardProps = {
   children: ReactNode
   className?: string
 }
 
-function Card({ children, className = '' }: CardProps) {
+function Card({ children, className }: CardProps) {
   return (
-    <div className={`rounded-xl border border-[var(--color-border)] p-6 text-[var(--color-fg)] shadow-sm ${className}`}>
+    <div className={cn('rounded-xl shadow-xl p-6 text-fg shadow-sm', className)}>
       {children}
     </div>
   )

@@ -1,14 +1,14 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs'
 import { Toaster } from 'sonner'
-import { ThemeProvider } from '@mui/material/styles'
 import { Container, Box, Typography, Button, Paper, Pagination, Stack, CircularProgress } from '@mui/material'
-import { getAchievements } from '@/lib/api/achievements'
-import type { Achievement } from '@/data/achievement'
+import { getAchievements } from '@/services/achievements'
+import type { Achievement, AchievementListParams } from '@/data/achievement'
 import AchievementToolbar from '@/components/achievements/AchievementToolbar'
 import AchievementTable from '@/components/achievements/AchievementTable'
 import AchievementDialog from '@/components/achievements/AchievementDialog'
-import { createDynamicTheme } from '@/lib/mui-theme'
+
+const LIMIT = 10
 
 function Achievements() {
   const [query, setQuery] = useQueryStates({
@@ -23,9 +23,19 @@ function Achievements() {
     createdTo: parseAsString,
     updatedFrom: parseAsString,
     updatedTo: parseAsString,
+    progressMin: parseAsInteger,
+    progressMax: parseAsInteger,
   })
 
   const [achievements, setAchievements] = useState<Achievement[]>([])
+  const [pagination, setPagination] = useState<{
+    first?: number
+    items?: number
+    last?: number
+    next?: number | null
+    pages?: number
+    prev?: number | null
+  }>({})
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null)
@@ -33,29 +43,45 @@ function Achievements() {
   const fetchAchievements = useCallback(async () => {
     try {
       setLoading(true)
-      const params: any = {
-        page: query.page || 1,
-        limit: query.limit || 10,
-        sortBy: query.sortBy || 'updatedAt',
-        order: (query.order as 'asc' | 'desc') || 'desc',
+      const params: AchievementListParams = {
+        _page: query.page || 1,
+        _per_page: query.limit || LIMIT,
       }
 
-      if (query.search) params.search = query.search
+      const sortBy = query.sortBy || 'updatedAt'
+      const order = (query.order as 'asc' | 'desc') || 'desc'
+      params._sort = order === 'asc' ? sortBy : `-${sortBy}`
+
+      if (query.search) params.q = query.search
       if (query.category) params.category = query.category
-      if (query.status) params.status = query.status
-      if (query.createdFrom) params.createdFrom = query.createdFrom
-      if (query.createdTo) params.createdTo = query.createdTo
-      if (query.updatedFrom) params.updatedFrom = query.updatedFrom
-      if (query.updatedTo) params.updatedTo = query.updatedTo
+      if (query.updatedFrom) {
+        const dateFrom = new Date(query.updatedFrom + 'T00:00:00').getTime() / 1000
+        params.updatedAt_gte = Math.floor(dateFrom).toString()
+      }
+      if (query.updatedTo) {
+        const dateTo = new Date(query.updatedTo + 'T23:59:59').getTime() / 1000
+        params.updatedAt_lte = Math.floor(dateTo).toString()
+      }
+      if (query.progressMin !== null && query.progressMin !== undefined) params.progress_gte = query.progressMin
+      if (query.progressMax !== null && query.progressMax !== undefined) params.progress_lte = query.progressMax
 
       const response = await getAchievements(params)
-      setAchievements(response.data)
+      
+      setAchievements(response.data || [])
+      setPagination({
+        first: response.first,
+        items: response.items,
+        last: response.last,
+        next: response.next,
+        pages: response.pages,
+        prev: response.prev,
+      })
     } catch (error) {
       console.error('Failed to fetch achievements:', error)
     } finally {
       setLoading(false)
     }
-  }, [query.page, query.limit, query.search, query.sortBy, query.order, query.category, query.status, query.createdFrom, query.createdTo, query.updatedFrom, query.updatedTo])
+  }, [query.page, query.limit, query.search, query.sortBy, query.order, query.category, query.updatedFrom, query.updatedTo, query.progressMin, query.progressMax])
 
   useEffect(() => {
     fetchAchievements()
@@ -83,58 +109,65 @@ function Achievements() {
     setQuery({ page: value })
   }
 
-  const theme = useMemo(() => createDynamicTheme(), [])
-
   return (
-    <ThemeProvider theme={theme}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Toaster position="top-right" />
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4" component="h1">
-            Achievements
-          </Typography>
-          <Button variant="contained" onClick={handleCreate}>
-            Create Achievement
-          </Button>
-        </Box>
-
-        <AchievementToolbar />
-
-        {loading ? (
-          <Paper sx={{ p: 4, textAlign: 'center' }}>
-            <CircularProgress />
-          </Paper>
-        ) : (
-          <>
-            <AchievementTable achievements={achievements} onRefresh={handleRefresh} onEdit={handleEdit} />
-
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 3 }}>
-              <Typography variant="body2" color="text.secondary">
-                Page {query.page || 1} - Showing {achievements.length} items
-              </Typography>
-              <Pagination
-                count={Math.ceil(achievements.length / (query.limit || 10)) || 1}
-                page={query.page || 1}
-                onChange={handlePageChange}
-                color="primary"
-                showFirstButton
-                showLastButton
-              />
-            </Stack>
-          </>
-        )}
-
-        <AchievementDialog
-          open={dialogOpen}
-          onClose={() => {
-            setDialogOpen(false)
-            setEditingAchievement(null)
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Toaster position="top-right" />
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h4" component="h1">
+          Achievements
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={handleCreate}
+          sx={{
+            backgroundColor: 'var(--color-border)',
+            color: 'var(--color-fg)',
+            '&:hover': {
+              backgroundColor: 'var(--color-border)',
+              opacity: 0.8,
+            },
           }}
-          onSuccess={handleDialogSuccess}
-          achievement={editingAchievement}
-        />
-      </Container>
-    </ThemeProvider>
+        >
+          Create Achievement
+        </Button>
+      </Box>
+
+      <AchievementToolbar />
+
+      {loading ? (
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <CircularProgress />
+        </Paper>
+      ) : (
+        <>
+          <AchievementTable achievements={achievements} onRefresh={handleRefresh} onEdit={handleEdit} />
+
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 3 }}>
+            <Typography variant="body2" color="text.secondary">
+              Page {pagination.first || query.page || 1} of {pagination.pages || 1} - Total {pagination.items || 0} items
+            </Typography>
+            <Pagination
+              count={pagination.pages || 1}
+              page={pagination.first || query.page || 1}
+              onChange={handlePageChange}
+              color="primary"
+              showFirstButton
+              showLastButton
+            />
+          </Stack>
+        </>
+      )}
+
+      <AchievementDialog
+        open={dialogOpen}
+        onClose={() => {
+          setDialogOpen(false)
+          setEditingAchievement(null)
+        }}
+        onSuccess={handleDialogSuccess}
+        achievement={editingAchievement}
+      />
+    </Container>
   )
 }
 

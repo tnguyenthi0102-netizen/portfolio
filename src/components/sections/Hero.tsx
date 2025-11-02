@@ -8,7 +8,7 @@ function Hero() {
             alt="Trang Nguyen portrait"
             className="h-24 w-24 rounded-full object-cover border-[0.35rem] border-[--color-card] shadow-xl"
           />
-          <span className="absolute bottom-0 right-0 text-4xl">👋</span>
+          <span className="absolute bottom-0 right-0 text-4xl animate-wave origin-bottom-right">👋</span>
         </div>
       </div>
 
@@ -24,10 +24,10 @@ function Hero() {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-2 px-4 text-[--text-lg] font-medium">
         <a
           href="#contact"
-          className="group bg-gray-900 text-white px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-110 hover:scale-110 hover:bg-gray-950 active:scale-105 transition dark:bg-gray-800 dark:hover:bg-gray-700"
+          className="group text-white px-7 py-3 flex items-center gap-2 rounded-full outline-none 
+          focus:scale-110 hover:scale-110 active:scale-105 transition bg-gray-800 hover:bg-gray-700"
         >
           Contact me here
-          <span className="opacity-70 group-hover:translate-x-1 transition inline-block"></span>
         </a>
       </div>
     </section>

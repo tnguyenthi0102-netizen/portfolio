@@ -32,7 +32,7 @@ type ProjectCardProps = {
 function ProjectCard({ project, index }: ProjectCardProps) {
   const reverse = index % 2 === 1
   return (
-    <Card className="relative">
+    <Card className="relative bg-[var(--color-card-bg)] transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-2xl">
       <div className={cn('flex flex-col', reverse ? 'sm:flex-row-reverse' : 'sm:flex-row')}>
         {/* Left Section - Text Content */}
         <div className="flex-1 flex flex-col">
@@ -50,19 +50,19 @@ function ProjectCard({ project, index }: ProjectCardProps) {
                 key={i}
                 text={tag}
                 size="sm"
-                className="bg-[var(--color-border)] text-[var(--color-fg)] tracking-wider rounded py-1.5"
+                className="bg-[var(--color-border)] text-[var(--color-fg)] tracking-wider rounded-xl py-1.5"
               />
             ))}
           </div>
         </div>
 
         {/* Right Section - Image */}
-        <div className={cn('relative sm:w-96 sm:min-w-96 h-64 sm:h-auto mt-4 sm:mt-0 flex items-center justify-center', reverse ? 'sm:mr-6' : 'sm:ml-6')}>
-          <div className="relative w-full h-full">
+        <div className={cn('relative sm:w-96 sm:min-w-96 h-64 sm:max-h-96 mt-4 sm:mt-0 flex items-center justify-center overflow-hidden rounded-lg', reverse ? 'sm:mr-6' : 'sm:ml-6')}>
+          <div className="relative w-full h-full max-h-64 sm:max-h-96 flex items-center justify-center rounded-lg">
             <img
               src={project.imageUrl || 'https://via.placeholder.com/600x400'}
               alt={`${project.title} project`}
-              className="w-full h-full object-contain rounded-lg"
+              className="w-full h-full max-w-full max-h-64 sm:max-h-96 object-contain rounded-lg"
             />
           </div>
         </div>
