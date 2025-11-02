@@ -39,6 +39,35 @@ interface AchievementDialogProps {
   achievement?: Achievement | null
 }
 
+let idCounter = 0
+function generateUniqueId(): number {
+  const timestamp = Date.now()
+  const random = Math.floor(Math.random() * 1000)
+  idCounter = (idCounter + 1) % 10000
+  return timestamp * 10000000 + idCounter * 1000 + random
+}
+
+function normalizeAchievementData(
+  data: AchievementFormData,
+  options?: { ensureDescription?: boolean },
+) {
+  const normalizedTodos = filterValidTodos(data.todos || []).map((todo) => ({
+    ...todo,
+    id: typeof todo.id === 'number' ? todo.id : generateUniqueId(),
+    title: todo.title,
+    done: todo.done ?? false,
+  }))
+
+  const description = options?.ensureDescription ? data.description || '' : data.description
+
+  return {
+    title: data.title,
+    description: description as string,
+    category: data.category,
+    todos: normalizedTodos,
+  }
+}
+
 function AchievementDialog({ open, onClose, onSuccess, achievement }: AchievementDialogProps) {
   const dispatch = useAppDispatch()
 
@@ -97,15 +126,7 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
           onClose()
           return
         }
-        const normalizedData = {
-          title: data.title,
-          description: data.description,
-          category: data.category,
-          todos: filterValidTodos(data.todos).map((todo) => ({
-            ...todo,
-            id: typeof todo.id === 'number' ? todo.id : Date.now(),
-          })),
-        }
+        const normalizedData = normalizeAchievementData(data)
         await dispatch(
           updateAchievementThunk({
             id: achievement.id,
@@ -114,18 +135,7 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
         ).unwrap()
         toast.success('Achievement updated successfully')
       } else {
-        const normalizedData = {
-          title: data.title,
-          description: data.description,
-          category: data.category,
-          status: 'pending',
-          score: 0,
-          todos: filterValidTodos(data.todos).map((todo) => ({
-            id: typeof todo.id === 'number' ? todo.id : Date.now(),
-            title: todo.title,
-            done: todo.done ?? false,
-          })),
-        }
+        const normalizedData = normalizeAchievementData(data, { ensureDescription: true })
         await dispatch(createAchievementThunk(normalizedData)).unwrap()
         toast.success('Achievement created successfully')
       }
@@ -206,19 +216,20 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
                   No todos added
                 </Typography>
               )}
-
-              {fields.map((field, index) => (
-                <TodoItemRow
-                  key={field.id}
-                  mode="form"
-                  index={index}
-                  control={control}
-                  register={register}
-                  errors={errors}
-                  onRemove={() => remove(index)}
-                  variant="form"
-                />
-              ))}
+              <Box sx={{ maxHeight: '200px', overflow: 'auto' }}>
+                {fields.map((field, index) => (
+                  <TodoItemRow
+                    key={field.id}
+                    mode="form"
+                    index={index}
+                    control={control}
+                    register={register}
+                    errors={errors}
+                    onRemove={() => remove(index)}
+                    variant="form"
+                  />
+                ))}
+              </Box>
             </Box>
           </Box>
         </DialogContent>

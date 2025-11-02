@@ -2,7 +2,6 @@ import { cn } from '@/lib/cn'
 
 type TagProps = {
   text: string
-  borderRadius?: number | string
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
@@ -13,7 +12,7 @@ const sizeStyles = {
   lg: 'px-5 py-2.5 text-base',
 }
 
-export default function Tag({ text, borderRadius, size = 'md', className = '' }: TagProps) {
+export default function Tag({ text, size = 'md', className = '' }: TagProps) {
   return (
     <span
       className={cn(

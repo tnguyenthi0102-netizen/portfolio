@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import { getMuiTheme } from './muiTheme'
 import { getPreferredTheme, setTheme, setDocumentTheme, type ThemeMode } from './theme'
@@ -59,15 +59,12 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setTheme(nextMode)
   }
 
-  const muiTheme = useMemo(() => getMuiTheme(isDark), [isDark])
+  const muiTheme = getMuiTheme(isDark)
 
-  const value = useMemo(
-    () => ({
-      mode,
-      toggleColorMode,
-    }),
-    [mode],
-  )
+  const value = {
+    mode,
+    toggleColorMode,
+  }
 
   return (
     <ThemeContext.Provider value={value}>

@@ -91,7 +91,7 @@ function TodoItemRow(props: TodoItemRowProps) {
   const hasError = !!errorMessage
 
   const content = (
-    <Box sx={{ position: 'relative', width: '100%', pb: 3 }}>
+    <Box sx={{ position: 'relative', width: '100%',}}>
       <Box
         sx={{
           display: 'flex',
@@ -135,21 +135,7 @@ function TodoItemRow(props: TodoItemRowProps) {
           <DeleteIcon fontSize="small" />
         </IconButton>
       </Box>
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          pl: 5,
-          fontSize: '0.75rem',
-          color: 'error.main',
-          minHeight: '20px',
-          visibility: hasError ? 'visible' : 'hidden',
-        }}
-      >
-        {errorMessage || '\u00A0'}
-      </Box>
+      
     </Box>
   )
 

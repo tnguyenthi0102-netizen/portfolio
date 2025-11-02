@@ -1,5 +1,5 @@
 import { createTheme } from '@mui/material/styles'
-import { getColors, themeConfig } from './theme'
+import { getColors } from './theme'
 
 export function getMuiTheme(isDark: boolean) {
   const colors = getColors(isDark)
@@ -25,6 +25,14 @@ export function getMuiTheme(isDark: boolean) {
     },
     typography: {
       fontSize: 16,
+      h4: {
+        fontSize: '1.25rem',
+        lineHeight: 1.5,
+        '@media (min-width:600px)': {
+          fontSize: '2.125rem',
+          lineHeight: 1.235,
+        },
+      },
     },
     components: {
       MuiButton: {
@@ -55,9 +63,7 @@ export function getMuiTheme(isDark: boolean) {
             '& .MuiOutlinedInput-notchedOutline': {
               borderColor: colors.border,
             },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: colors.border,
-            },
+
           },
         },
       },
@@ -96,7 +102,9 @@ export function getMuiTheme(isDark: boolean) {
           root: {
             '&.MuiPickersTextField-root .MuiPickersInputBase-root': {
               backgroundColor: colors.bg,
+              
             },
+  
           },
         },
       },

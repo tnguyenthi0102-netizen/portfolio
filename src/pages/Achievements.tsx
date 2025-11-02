@@ -45,6 +45,7 @@ function Achievements() {
     if (query.page && query.page !== 1) {
       setQuery({ page: 1 })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     query.q,
     query.category,
@@ -136,8 +137,15 @@ function Achievements() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Toaster position="top-right" />
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" component="h1">
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: { xs: 'wrap', md: 'nowrap' }, gap: { xs: 2, md: 0 } }}>
+        <Typography 
+          variant="h4" 
+          component="h1"
+          sx={{ 
+            width: { xs: '100%', md: 'auto' },
+            wordBreak: 'break-word'
+          }}
+        >
           Achievements
         </Typography>
         <Button
@@ -166,19 +174,33 @@ function Achievements() {
         <>
           <AchievementTable achievements={achievements} onEdit={handleEdit} />
 
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 3 }}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            justifyContent={{ xs: 'flex-start', md: 'space-between' }}
+            alignItems={{ xs: 'flex-start', md: 'center' }}
+            spacing={{ xs: 1.5, md: 0 }}
+            sx={{ mt: 3 }}
+          >
             <Typography variant="body2" color="text.secondary">
               Page {pagination.first || query.page || 1} of {pagination.pages || 1} - Total{' '}
               {pagination.items || 0} items
             </Typography>
-            <Pagination
-              count={pagination.pages || 1}
-              page={query.page || 1}
-              onChange={handlePageChange}
-              color="primary"
-              showFirstButton
-              showLastButton
-            />
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: { xs: 'left', md: 'flex-end' },
+                width: { xs: '100%', md: 'auto' },
+              }}
+            >
+              <Pagination
+                count={pagination.pages || 1}
+                page={query.page || 1}
+                onChange={handlePageChange}
+                color="primary"
+                showFirstButton
+                showLastButton
+              />
+            </Box>
           </Stack>
         </>
       )}

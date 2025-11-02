@@ -1,13 +1,3 @@
-type ColorTokens = {
-  bg: string
-  fg: string
-  muted: string
-  border: string
-  card: string
-  accent: string
-  accentFg: string
-}
-
 type FontSizeTokens = {
   xs: string
   sm: string

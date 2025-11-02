@@ -22,7 +22,7 @@ function ContactSection() {
         setSenderEmail('')
         setMessage('')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to send email')
     } finally {
       setIsSubmitting(false)
