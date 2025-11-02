@@ -19,5 +19,3 @@ export default function ErrorScreen({ message }: Props) {
     </div>
   )
 }
-
-

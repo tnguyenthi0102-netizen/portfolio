@@ -26,16 +26,19 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [mode, setMode] = useState<ThemeMode>(() => getPreferredTheme())
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (mode === 'system') {
-      return typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+      return (
+        typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+      )
     }
     return mode === 'dark'
   })
 
   useEffect(() => {
     setDocumentTheme(mode)
-    const effectiveIsDark = mode === 'system'
-      ? typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
-      : mode === 'dark'
+    const effectiveIsDark =
+      mode === 'system'
+        ? typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+        : mode === 'dark'
     setIsDark(effectiveIsDark)
 
     if (mode === 'system' && typeof window !== 'undefined') {
@@ -58,17 +61,17 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   const muiTheme = useMemo(() => getMuiTheme(isDark), [isDark])
 
-  const value = useMemo(() => ({
-    mode,
-    toggleColorMode,
-  }), [mode])
+  const value = useMemo(
+    () => ({
+      mode,
+      toggleColorMode,
+    }),
+    [mode],
+  )
 
   return (
     <ThemeContext.Provider value={value}>
-      <MuiThemeProvider theme={muiTheme}>
-        {children}
-      </MuiThemeProvider>
+      <MuiThemeProvider theme={muiTheme}>{children}</MuiThemeProvider>
     </ThemeContext.Provider>
   )
 }
-

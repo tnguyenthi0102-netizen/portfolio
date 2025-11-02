@@ -1,8 +1,16 @@
-import type { Achievement, AchievementCreateInput, AchievementUpdateInput, AchievementListParams, AchievementListResponse } from '@/data/achievement'
+import type {
+  Achievement,
+  AchievementCreateInput,
+  AchievementUpdateInput,
+  AchievementListParams,
+  AchievementListResponse,
+} from '@/data/achievement'
 import { api } from '@/services/api'
 import { calculateProgress } from '@/utils/achievement'
 
-export async function getAchievements(params: AchievementListParams = {}): Promise<AchievementListResponse> {
+export async function getAchievements(
+  params: AchievementListParams = {},
+): Promise<AchievementListResponse> {
   const queryParams: Record<string, string> = {}
 
   Object.entries(params).forEach(([key, value]) => {
@@ -33,7 +41,10 @@ export async function createAchievement(input: AchievementCreateInput): Promise<
   return response.data
 }
 
-export async function updateAchievement(id: string, input: AchievementUpdateInput): Promise<Achievement> {
+export async function updateAchievement(
+  id: string,
+  input: AchievementUpdateInput,
+): Promise<Achievement> {
   const existing = await getAchievement(id)
   const todos = input.todos !== undefined ? input.todos : existing.todos
   const progress = calculateProgress(todos)

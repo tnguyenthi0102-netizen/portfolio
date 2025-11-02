@@ -31,7 +31,7 @@ function TodoItemRow(props: TodoItemRowProps) {
 
   if (props.mode === 'controlled') {
     const { todo, onToggle, onTitleChange, onRemove } = props
-    
+
     const content = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Checkbox
@@ -87,40 +87,69 @@ function TodoItemRow(props: TodoItemRowProps) {
 
   const { index, control, register, errors, onRemove } = props
 
+  const errorMessage = errors.todos?.[index]?.title?.message
+  const hasError = !!errorMessage
+
   const content = (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-      <Controller
-        name={`todos.${index}.done`}
-        control={control}
-        render={({ field }) => (
-          <Checkbox
-            {...field}
-            checked={field.value}
-            onChange={(e) => field.onChange(e.target.checked)}
-            color="success"
-          />
-        )}
-      />
-      <TextField
-        {...register(`todos.${index}.title` as const)}
-        placeholder={`Todo #${index + 1}`}
-        size="small"
-        fullWidth
-        sx={{ flex: 1, minWidth: 0 }}
-        error={!!errors.todos?.[index]?.title}
-        helperText={errors.todos?.[index]?.title?.message}
-        onClick={(e) => e.stopPropagation()}
-      />
-      <IconButton
-        size="small"
-        color="error"
-        onClick={(e) => {
-          e.stopPropagation()
-          onRemove()
+    <Box sx={{ position: 'relative', width: '100%', pb: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 1,
+          width: '100%',
         }}
       >
-        <DeleteIcon fontSize="small" />
-      </IconButton>
+        <Controller
+          name={`todos.${index}.done`}
+          control={control}
+          render={({ field }) => (
+            <Checkbox
+              {...field}
+              checked={field.value}
+              onChange={(e) => field.onChange(e.target.checked)}
+              color="success"
+            />
+          )}
+        />
+        <TextField
+          {...register(`todos.${index}.title` as const)}
+          placeholder={`Todo #${index + 1}`}
+          size="small"
+          fullWidth
+          sx={{ flex: 1, minWidth: 0 }}
+          error={hasError}
+          helperText=""
+          FormHelperTextProps={{ sx: { display: 'none', margin: 0 } }}
+          onClick={(e) => e.stopPropagation()}
+        />
+        <IconButton
+          size="small"
+          color="error"
+          onClick={(e) => {
+            e.stopPropagation()
+            onRemove()
+          }}
+        >
+          <DeleteIcon fontSize="small" />
+        </IconButton>
+      </Box>
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          pl: 5,
+          fontSize: '0.75rem',
+          color: 'error.main',
+          minHeight: '20px',
+          visibility: hasError ? 'visible' : 'hidden',
+        }}
+      >
+        {errorMessage || '\u00A0'}
+      </Box>
     </Box>
   )
 

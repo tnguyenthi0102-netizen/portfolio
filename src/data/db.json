@@ -1,329 +1,44 @@
 {
   "achievements": [
     {
-      "createdAt": 1761832042,
-      "title": "title 111",
-      "description": "description 1",
-      "updatedAt": 1762053097,
-      "category": "Education",
-      "status": "status 1",
-      "score": 24,
-      "image": "image 1",
-      "id": "1",
+      "id": "6448",
+      "title": "1",
+      "description": "ds",
+      "category": "Technical",
+      "status": "pending",
+      "score": 0,
       "todos": [
         {
-          "id": 1,
+          "id": 1762084476903,
           "title": "1",
           "done": false
         },
         {
-          "id": 2,
+          "id": 1762084476903,
           "title": "2",
-          "done": true
-        }
-      ],
-      "progress": 50
-    },
-    {
-      "createdAt": 1761831982,
-      "title": "title 24",
-      "description": "description 2",
-      "updatedAt": 1762002701,
-      "category": "category 2",
-      "status": "status 2",
-      "score": 70,
-      "image": "image 2",
-      "id": "2"
-    },
-    {
-      "createdAt": 1761831922,
-      "title": "title 3",
-      "description": "description 3",
-      "updatedAt": 1761831922,
-      "category": "category 3",
-      "status": "status 3",
-      "score": 34,
-      "image": "image 3",
-      "id": "3"
-    },
-    {
-      "createdAt": 1761831862,
-      "title": "title 4",
-      "description": "description 4",
-      "updatedAt": 1761831862,
-      "category": "category 4",
-      "status": "status 4",
-      "score": 25,
-      "image": "image 4",
-      "id": "4"
-    },
-    {
-      "createdAt": 1761831802,
-      "title": "title 5",
-      "description": "description 5",
-      "updatedAt": 1761831802,
-      "category": "category 5",
-      "status": "status 5",
-      "score": 2,
-      "image": "image 5",
-      "id": "5"
-    },
-    {
-      "createdAt": 1761831742,
-      "title": "title 6",
-      "description": "description 6",
-      "updatedAt": 1761831742,
-      "category": "category 6",
-      "status": "status 6",
-      "score": 81,
-      "image": "image 6",
-      "id": "6"
-    },
-    {
-      "createdAt": 1761831682,
-      "title": "title 7",
-      "description": "description 7",
-      "updatedAt": 1761831682,
-      "category": "category 7",
-      "status": "status 7",
-      "score": 95,
-      "image": "image 7",
-      "id": "7"
-    },
-    {
-      "createdAt": 1761831622,
-      "title": "title 8",
-      "description": "description 8",
-      "updatedAt": 1761831622,
-      "category": "category 8",
-      "status": "status 8",
-      "score": 2,
-      "image": "image 8",
-      "id": "8"
-    },
-    {
-      "createdAt": 1761831562,
-      "title": "title 9",
-      "description": "description 9",
-      "updatedAt": 1761831562,
-      "category": "category 9",
-      "status": "status 9",
-      "score": 30,
-      "image": "image 9",
-      "id": "9"
-    },
-    {
-      "createdAt": 1761831502,
-      "title": "title 10",
-      "description": "description 10",
-      "updatedAt": 1761831502,
-      "category": "category 10",
-      "status": "status 10",
-      "score": 52,
-      "image": "image 10",
-      "id": "10"
-    },
-    {
-      "createdAt": 1761831442,
-      "title": "title 11",
-      "description": "description 11",
-      "updatedAt": 1761831442,
-      "category": "category 11",
-      "status": "status 11",
-      "score": 78,
-      "image": "image 11",
-      "id": "11"
-    },
-    {
-      "createdAt": 1761831382,
-      "title": "title 12",
-      "description": "description 12",
-      "updatedAt": 1761831382,
-      "category": "category 12",
-      "status": "status 12",
-      "score": 42,
-      "image": "image 12",
-      "id": "12"
-    },
-    {
-      "createdAt": 1761831322,
-      "title": "title 13",
-      "description": "description 13",
-      "updatedAt": 1761831322,
-      "category": "category 13",
-      "status": "status 13",
-      "score": 71,
-      "image": "image 13",
-      "id": "13"
-    },
-    {
-      "createdAt": 1761831262,
-      "title": "title 14",
-      "description": "description 14",
-      "updatedAt": 1761831262,
-      "category": "category 14",
-      "status": "status 14",
-      "score": 46,
-      "image": "image 14",
-      "id": "14"
-    },
-    {
-      "createdAt": 1761831202,
-      "title": "title 15",
-      "description": "description 15",
-      "updatedAt": 1761831202,
-      "category": "category 15",
-      "status": "status 15",
-      "score": 53,
-      "image": "image 15",
-      "id": "15"
-    },
-    {
-      "createdAt": 1761831142,
-      "title": "title 16",
-      "description": "description 16",
-      "updatedAt": 1761831142,
-      "category": "category 16",
-      "status": "status 16",
-      "score": 18,
-      "image": "image 16",
-      "id": "16"
-    },
-    {
-      "createdAt": 1761831082,
-      "title": "title 17",
-      "description": "description 17",
-      "updatedAt": 1761831082,
-      "category": "category 17",
-      "status": "status 17",
-      "score": 38,
-      "image": "image 17",
-      "id": "17"
-    },
-    {
-      "createdAt": 1761831022,
-      "title": "title 18",
-      "description": "description 18",
-      "updatedAt": 1761831022,
-      "category": "category 18",
-      "status": "status 18",
-      "score": 71,
-      "image": "image 18",
-      "id": "18"
-    },
-    {
-      "createdAt": 1761830962,
-      "title": "title 19",
-      "description": "description 19",
-      "updatedAt": 1761830962,
-      "category": "category 19",
-      "status": "status 19",
-      "score": 78,
-      "image": "image 19",
-      "id": "19"
-    },
-    {
-      "createdAt": 1761830902,
-      "title": "title 20",
-      "description": "description 20",
-      "updatedAt": 1761830902,
-      "category": "category 20",
-      "status": "status 20",
-      "score": 12,
-      "image": "image 20",
-      "id": "20"
-    },
-    {
-      "createdAt": 1761830842,
-      "title": "title 21",
-      "description": "description 21",
-      "updatedAt": 1761830842,
-      "category": "category 21",
-      "status": "status 21",
-      "score": 89,
-      "image": "image 21",
-      "id": "21"
-    },
-    {
-      "createdAt": 1761830782,
-      "title": "title 22",
-      "description": "description 22",
-      "updatedAt": 1761830782,
-      "category": "category 22",
-      "status": "status 22",
-      "score": 44,
-      "image": "image 22",
-      "id": "22"
-    },
-    {
-      "createdAt": 1761830722,
-      "title": "title 23",
-      "description": "description 23",
-      "updatedAt": 1761830722,
-      "category": "category 23",
-      "status": "status 23",
-      "score": 81,
-      "image": "image 23",
-      "id": "23"
-    },
-    {
-      "createdAt": 1761830662,
-      "title": "title 24",
-      "description": "description 24",
-      "updatedAt": 1761830662,
-      "category": "category 24",
-      "status": "status 24",
-      "score": 39,
-      "image": "image 24",
-      "id": "24"
-    },
-    {
-      "createdAt": 1761830602,
-      "title": "title 25",
-      "description": "description 25",
-      "updatedAt": 1761830602,
-      "category": "category 25",
-      "status": "status 25",
-      "score": 87,
-      "image": "image 25",
-      "id": "25"
-    },
-    {
-      "id": "9ca2",
-      "title": "22",
-      "description": "222",
-      "category": "Technical",
-      "status": "In Progress",
-      "createdAt": 1761993867,
-      "updatedAt": 1762002658
-    },
-    {
-      "id": "1050",
-      "title": "33",
-      "description": "33",
-      "category": "Technical",
-      "status": "Pending",
-      "createdAt": 1762006073,
-      "updatedAt": 1762006073
-    },
-    {
-      "id": "b114",
-      "title": "f",
-      "description": "f",
-      "category": "Technical",
-      "todos": [
-        {
-          "title": "f",
           "done": false
         },
         {
-          "title": "4",
+          "id": 1762084476904,
+          "title": "3",
           "done": true
         }
       ],
-      "createdAt": 1762010807,
-      "updatedAt": 1762011404
+      "progress": 33,
+      "createdAt": 1762084476,
+      "updatedAt": 1762084530
+    },
+    {
+      "id": "cca3",
+      "title": "22",
+      "description": "abc",
+      "category": "Education",
+      "status": "pending",
+      "score": 0,
+      "todos": [],
+      "progress": 0,
+      "createdAt": 1762084485,
+      "updatedAt": 1762084504
     }
   ]
 }
-

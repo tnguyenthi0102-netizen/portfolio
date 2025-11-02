@@ -8,12 +8,8 @@ type CardProps = {
 
 function Card({ children, className }: CardProps) {
   return (
-    <div className={cn('rounded-xl shadow-xl p-6 text-fg shadow-sm', className)}>
-      {children}
-    </div>
+    <div className={cn('rounded-xl shadow-xl p-6 text-fg shadow-sm', className)}>{children}</div>
   )
 }
 
 export default Card
-
-

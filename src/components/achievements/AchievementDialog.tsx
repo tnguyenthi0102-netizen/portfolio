@@ -19,9 +19,15 @@ import {
   Divider,
 } from '@mui/material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { achievementSchema, type AchievementFormData, areValuesEqual, filterValidTodos } from '@/utils/achievement'
-import { createAchievement, updateAchievement } from '@/services/achievements'
+import {
+  achievementSchema,
+  type AchievementFormData,
+  areValuesEqual,
+  filterValidTodos,
+} from '@/utils/achievement'
 import { toast } from 'sonner'
+import { useAppDispatch } from '@/store'
+import { createAchievementThunk, updateAchievementThunk } from '@/store/slices/achievementsSlice'
 import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
 import type { Achievement } from '@/data/achievement'
 import TodoItemRow from './TodoItemRow'
@@ -34,6 +40,8 @@ interface AchievementDialogProps {
 }
 
 function AchievementDialog({ open, onClose, onSuccess, achievement }: AchievementDialogProps) {
+  const dispatch = useAppDispatch()
+
   const {
     register,
     handleSubmit,
@@ -93,12 +101,17 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
           title: data.title,
           description: data.description,
           category: data.category,
-          todos: filterValidTodos(data.todos).map(todo => ({
+          todos: filterValidTodos(data.todos).map((todo) => ({
             ...todo,
             id: typeof todo.id === 'number' ? todo.id : Date.now(),
           })),
         }
-        await updateAchievement(achievement.id, normalizedData)
+        await dispatch(
+          updateAchievementThunk({
+            id: achievement.id,
+            input: normalizedData,
+          }),
+        ).unwrap()
         toast.success('Achievement updated successfully')
       } else {
         const normalizedData = {
@@ -107,21 +120,22 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
           category: data.category,
           status: 'pending',
           score: 0,
-          todos: filterValidTodos(data.todos).map(todo => ({
+          todos: filterValidTodos(data.todos).map((todo) => ({
             id: typeof todo.id === 'number' ? todo.id : Date.now(),
             title: todo.title,
             done: todo.done ?? false,
           })),
         }
-        await createAchievement(normalizedData)
+        await dispatch(createAchievementThunk(normalizedData)).unwrap()
         toast.success('Achievement created successfully')
       }
       onSuccess()
       onClose()
       reset()
-    } catch (error) {
-      toast.error(achievement ? 'Failed to update achievement' : 'Failed to create achievement')
-      console.error(error)
+    } catch (error: any) {
+      toast.error(
+        error || (achievement ? 'Failed to update achievement' : 'Failed to create achievement'),
+      )
     }
   }
 
@@ -153,9 +167,7 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
                   </Select>
                 )}
               />
-              {errors.category && (
-                <FormHelperText>{errors.category.message}</FormHelperText>
-              )}
+              {errors.category && <FormHelperText>{errors.category.message}</FormHelperText>}
             </FormControl>
             <TextField
               {...register('description')}
@@ -167,12 +179,18 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
               helperText={errors.description?.message}
             />
 
-
             <Divider sx={{ my: 2 }} />
 
             {/* ----- TODOS SECTION ----- */}
             <Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 1,
+                }}
+              >
                 <Typography variant="subtitle1">Todos</Typography>
                 <IconButton
                   size="small"
@@ -206,11 +224,16 @@ function AchievementDialog({ open, onClose, onSuccess, achievement }: Achievemen
         </DialogContent>
 
         <DialogActions sx={{ padding: 3 }}>
-          <Button onClick={onClose} variant="outlined"
+          <Button
+            onClick={onClose}
+            variant="outlined"
             sx={{
               borderColor: 'var(--color-border)',
               color: 'var(--color-fg)',
-            }}>Cancel</Button>
+            }}
+          >
+            Cancel
+          </Button>
           <Button type="submit" variant="contained" disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : achievement ? 'Update' : 'Create'}
           </Button>

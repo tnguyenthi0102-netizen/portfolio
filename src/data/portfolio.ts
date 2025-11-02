@@ -80,14 +80,31 @@ export const projectsData: Project[] = [
     title: 'SMARTUP',
     description:
       'Architected and developed e-learning platform with React/React Native. Implemented push notifications, CI/CD pipeline, and successfully deployed to both App Store and Google Play Store. Built RESTful APIs and optimized app performance for educational content delivery.',
-    tags: ['React JS', 'React Native', 'TypeScript', 'Push Notification', 'CI/CD', 'App Store Deployment', 'Google Play Store', 'REST API', 'E-Learning'],
+    tags: [
+      'React JS',
+      'React Native',
+      'TypeScript',
+      'Push Notification',
+      'CI/CD',
+      'App Store Deployment',
+      'Google Play Store',
+      'REST API',
+      'E-Learning',
+    ],
     imageUrl: '/images/smartup.png',
   },
   {
     title: 'PRISM',
     description:
       'Built interactive data analytics dashboards with advanced visualization features. Developed using Polymer framework and Groovy on Grails, implemented real-time data processing and created user-friendly interfaces for business intelligence.',
-    tags: ['Polymer', 'Groovy on Grails', 'Analytics', 'Dashboard', 'Data Visualization', 'Interactive Charts'],
+    tags: [
+      'Polymer',
+      'Groovy on Grails',
+      'Analytics',
+      'Dashboard',
+      'Data Visualization',
+      'Interactive Charts',
+    ],
     imageUrl: '/images/prism.png',
   },
   {

@@ -9,21 +9,21 @@ export const todoItemSchema = z.object({
 
 export const achievementSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
+  description: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
-  todos: z.array(todoItemSchema),
+  todos: z.array(todoItemSchema).optional(),
 })
 
 export type AchievementFormData = z.infer<typeof achievementSchema>
 
 export function calculateProgress(todos?: TodoItem[]): number {
   if (!todos || todos.length === 0) return 0
-  const completedCount = todos.filter(todo => todo.done).length
+  const completedCount = todos.filter((todo) => todo.done).length
   return Math.round((completedCount / todos.length) * 100)
 }
 
 export function filterValidTodos<T extends { title?: string }>(todos: T[]): T[] {
-  return todos.filter(todo => todo.title && todo.title.trim() !== '')
+  return todos.filter((todo) => todo.title && todo.title.trim() !== '')
 }
 
 type TodoComparable = {
@@ -39,10 +39,7 @@ type AchievementComparable = {
   todos?: TodoComparable[]
 }
 
-export function areValuesEqual(
-  val1: AchievementComparable,
-  val2: AchievementComparable
-): boolean {
+export function areValuesEqual(val1: AchievementComparable, val2: AchievementComparable): boolean {
   if (val1.title !== val2.title) return false
   if (val1.description !== val2.description) return false
   if (val1.category !== val2.category) return false
@@ -61,4 +58,3 @@ export function areValuesEqual(
 
   return true
 }
-

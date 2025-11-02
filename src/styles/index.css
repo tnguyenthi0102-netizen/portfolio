@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Theme tokens using Tailwind v4 @theme */
 
@@ -6,12 +6,20 @@
 
 /* base styles */
 @layer base {
-  html, body, #root { height: 100%; }
-  body { background-color: var(--color-bg); color: var(--color-fg); }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+  }
 }
 
 @keyframes wave {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(0deg);
   }
   25% {
@@ -21,5 +29,3 @@
     transform: rotate(-10deg);
   }
 }
-
-

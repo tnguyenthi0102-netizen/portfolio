@@ -59,4 +59,3 @@ export interface AchievementListResponse {
   pages?: number
   prev?: number | null
 }
-

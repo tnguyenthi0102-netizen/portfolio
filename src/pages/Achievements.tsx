@@ -1,16 +1,30 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs'
 import { Toaster } from 'sonner'
-import { Container, Box, Typography, Button, Paper, Pagination, Stack, CircularProgress } from '@mui/material'
-import { getAchievements } from '@/services/achievements'
+import {
+  Container,
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Pagination,
+  Stack,
+  CircularProgress,
+} from '@mui/material'
+import dayjs from 'dayjs'
 import type { Achievement, AchievementListParams } from '@/data/achievement'
 import AchievementToolbar from '@/components/achievements/AchievementToolbar'
 import AchievementTable from '@/components/achievements/AchievementTable'
 import AchievementDialog from '@/components/achievements/AchievementDialog'
+import { useAppDispatch, useAppSelector } from '@/store'
+import { fetchAchievements } from '@/store/slices/achievementsSlice'
 
 const LIMIT = 10
 
 function Achievements() {
+  const dispatch = useAppDispatch()
+  const { items: achievements, pagination, loading } = useAppSelector((state) => state.achievements)
+
   const [query, setQuery] = useQueryStates({
     page: parseAsInteger.withDefault(1),
     limit: parseAsInteger.withDefault(10),
@@ -18,91 +32,101 @@ function Achievements() {
     sortBy: parseAsString.withDefault('updatedAt'),
     order: parseAsString.withDefault('desc'),
     category: parseAsString,
-    status: parseAsString,
-    createdFrom: parseAsString,
-    createdTo: parseAsString,
     updatedFrom: parseAsString,
     updatedTo: parseAsString,
     progressMin: parseAsInteger,
     progressMax: parseAsInteger,
   })
 
-  const [achievements, setAchievements] = useState<Achievement[]>([])
-  const [pagination, setPagination] = useState<{
-    first?: number
-    items?: number
-    last?: number
-    next?: number | null
-    pages?: number
-    prev?: number | null
-  }>({})
-  const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null)
 
-  const fetchAchievements = async () => {
-    try {
-      setLoading(true)
-      const params: AchievementListParams = {
-        _page: query.page || 1,
-        _per_page: query.limit || LIMIT,
-      }
-
-      const sortBy = query.sortBy || 'updatedAt'
-      const order = (query.order as 'asc' | 'desc') || 'desc'
-      params._sort = order === 'asc' ? sortBy : `-${sortBy}`
-
-      if (query.q) params.q = query.q
-      if (query.category) params.category = query.category
-      if (query.updatedFrom) {
-        const dateFrom = new Date(query.updatedFrom + 'T00:00:00').getTime() / 1000
-        params.updatedAt_gte = Math.floor(dateFrom).toString()
-      }
-      if (query.updatedTo) {
-        const dateTo = new Date(query.updatedTo + 'T23:59:59').getTime() / 1000
-        params.updatedAt_lte = Math.floor(dateTo).toString()
-      }
-      if (query.progressMin !== null && query.progressMin !== undefined) params.progress_gte = query.progressMin
-      if (query.progressMax !== null && query.progressMax !== undefined) params.progress_lte = query.progressMax
-
-      const response = await getAchievements(params)
-      
-      setAchievements(response.data || [])
-      setPagination({
-        first: response.first,
-        items: response.items,
-        last: response.last,
-        next: response.next,
-        pages: response.pages,
-        prev: response.prev,
-      })
-    } catch (error) {
-      console.error('Failed to fetch achievements:', error)
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    if (query.page && query.page !== 1) {
+      setQuery({ page: 1 })
     }
-  }
+  }, [
+    query.q,
+    query.category,
+    query.updatedFrom,
+    query.updatedTo,
+    query.progressMin,
+    query.progressMax,
+  ])
 
   useEffect(() => {
-    fetchAchievements()
-  }, [query.page, query.q, query.category, query.updatedFrom, query.updatedTo, query.progressMin, query.progressMax])
+    const params: AchievementListParams = {
+      _page: query.page || 1,
+      _per_page: query.limit || LIMIT,
+    }
+
+    const sortBy = query.sortBy || 'updatedAt'
+    const order = (query.order as 'asc' | 'desc') || 'desc'
+    params._sort = order === 'asc' ? sortBy : `-${sortBy}`
+
+    if (query.q) params.q = query.q
+    if (query.category) params.category = query.category
+    if (query.updatedFrom) {
+      params.updatedAt_gte = dayjs(query.updatedFrom).startOf('day').unix().toString()
+    }
+    if (query.updatedTo) {
+      params.updatedAt_lte = dayjs(query.updatedTo).endOf('day').unix().toString()
+    }
+    if (query.progressMin !== null && query.progressMin !== undefined)
+      params.progress_gte = query.progressMin
+    if (query.progressMax !== null && query.progressMax !== undefined)
+      params.progress_lte = query.progressMax
+
+    dispatch(fetchAchievements(params))
+  }, [
+    dispatch,
+    query.page,
+    query.limit,
+    query.q,
+    query.category,
+    query.updatedFrom,
+    query.updatedTo,
+    query.progressMin,
+    query.progressMax,
+    query.sortBy,
+    query.order,
+  ])
 
   const handleCreate = () => {
     setEditingAchievement(null)
     setDialogOpen(true)
   }
 
-  const handleEdit = (achievement: Achievement) => {
+  const handleEdit = useCallback((achievement: Achievement) => {
     setEditingAchievement(achievement)
     setDialogOpen(true)
+  }, [])
+
+  const buildParams = (): AchievementListParams => {
+    const params: AchievementListParams = {
+      _page: query.page || 1,
+      _per_page: query.limit || LIMIT,
+    }
+    const sortBy = query.sortBy || 'updatedAt'
+    const order = (query.order as 'asc' | 'desc') || 'desc'
+    params._sort = order === 'asc' ? sortBy : `-${sortBy}`
+    if (query.q) params.q = query.q
+    if (query.category) params.category = query.category
+    if (query.updatedFrom) {
+      params.updatedAt_gte = dayjs(query.updatedFrom).startOf('day').unix().toString()
+    }
+    if (query.updatedTo) {
+      params.updatedAt_lte = dayjs(query.updatedTo).endOf('day').unix().toString()
+    }
+    if (query.progressMin !== null && query.progressMin !== undefined)
+      params.progress_gte = query.progressMin
+    if (query.progressMax !== null && query.progressMax !== undefined)
+      params.progress_lte = query.progressMax
+    return params
   }
 
   const handleDialogSuccess = () => {
-    fetchAchievements()
-  }
-
-  const handleRefresh = () => {
-    fetchAchievements()
+    dispatch(fetchAchievements(buildParams()))
   }
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
@@ -140,15 +164,16 @@ function Achievements() {
         </Paper>
       ) : (
         <>
-          <AchievementTable achievements={achievements} onRefresh={handleRefresh} onEdit={handleEdit} />
+          <AchievementTable achievements={achievements} onEdit={handleEdit} />
 
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 3 }}>
             <Typography variant="body2" color="text.secondary">
-              Page {pagination.first || query.page || 1} of {pagination.pages || 1} - Total {pagination.items || 0} items
+              Page {pagination.first || query.page || 1} of {pagination.pages || 1} - Total{' '}
+              {pagination.items || 0} items
             </Typography>
             <Pagination
               count={pagination.pages || 1}
-              page={pagination.first || query.page || 1}
+              page={query.page || 1}
               onChange={handlePageChange}
               color="primary"
               showFirstButton

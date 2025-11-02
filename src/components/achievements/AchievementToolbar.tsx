@@ -1,5 +1,5 @@
 import { useQueryStates, parseAsString, parseAsInteger } from 'nuqs'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import {
   TextField,
   Select,
@@ -21,19 +21,19 @@ import dayjs, { Dayjs } from 'dayjs'
 import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
 
 function AchievementToolbar() {
-  const [search, setSearch] = useQueryStates({
+  const [filterParams, setFilterParams] = useQueryStates({
     q: parseAsString.withDefault(''),
     category: parseAsString,
     updatedFrom: parseAsString,
     updatedTo: parseAsString,
     progressMin: parseAsInteger,
     progressMax: parseAsInteger,
-    page: parseAsString.withDefault('1'),
-    limit: parseAsString.withDefault('10'),
   })
 
+  const search = filterParams
+
   const [localSearch, setLocalSearch] = useState(search.q || '')
-  const [localCategory, setLocalCategory] = useState(search.category || '')
+  const [localCategory, setLocalCategory] = useState(search.category || 'all')
   const [localProgressRange, setLocalProgressRange] = useState<[number, number]>([
     search.progressMin ?? 0,
     search.progressMax ?? 100,
@@ -46,16 +46,17 @@ function AchievementToolbar() {
   })
 
   useEffect(() => {
+    setLocalCategory(search.category || 'all')
+  }, [search.category])
+
+  useEffect(() => {
     const from = search.updatedFrom ? dayjs(search.updatedFrom) : null
     const to = search.updatedTo ? dayjs(search.updatedTo) : null
     setDateRange([from, to])
   }, [search.updatedFrom, search.updatedTo])
 
   useEffect(() => {
-    setLocalProgressRange([
-      search.progressMin ?? 0,
-      search.progressMax ?? 100,
-    ])
+    setLocalProgressRange([search.progressMin ?? 0, search.progressMax ?? 100])
   }, [search.progressMin, search.progressMax])
 
   const handleDateRangeChange = (newValue: [Dayjs | null, Dayjs | null] | null) => {
@@ -67,34 +68,31 @@ function AchievementToolbar() {
   }
 
   const handleReset = () => {
-    setSearch({
+    setFilterParams({
       q: '',
       category: null,
-
       updatedFrom: null,
       updatedTo: null,
       progressMin: null,
       progressMax: null,
-      page: '1',
     })
     setLocalSearch('')
-    setLocalCategory('')
+    setLocalCategory('all')
     setDateRange([null, null])
     setLocalProgressRange([0, 100])
   }
 
   const handleApplyFilters = () => {
-    setSearch({
+    setFilterParams({
       q: localSearch || '',
-      category: localCategory && localCategory !== '' ? localCategory : null,
+      category: localCategory && localCategory !== 'all' ? localCategory : null,
       updatedFrom: dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : null,
       updatedTo: dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : null,
       progressMin: localProgressRange[0] !== 0 ? localProgressRange[0] : null,
       progressMax: localProgressRange[1] !== 100 ? localProgressRange[1] : null,
-      page: '1',
     })
   }
- 
+
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
       <Stack spacing={2}>
@@ -108,11 +106,7 @@ function AchievementToolbar() {
             InputProps={{
               endAdornment: localSearch ? (
                 <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setLocalSearch('')}
-                    edge="end"
-                    size="small"
-                  >
+                  <IconButton onClick={() => setLocalSearch('')} edge="end" size="small">
                     <ClearIcon fontSize="small" />
                   </IconButton>
                 </InputAdornment>
@@ -125,12 +119,12 @@ function AchievementToolbar() {
           <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 180 } }}>
             <InputLabel>Category</InputLabel>
             <Select
-              value={localCategory}
+              value={localCategory || 'all'}
               label="Category"
               onChange={(e) => setLocalCategory(e.target.value as string)}
-              renderValue={(value) => (value || 'All')}
+              renderValue={(value) => (value === 'all' ? 'All' : value)}
             >
-              <MenuItem value="">
+              <MenuItem value="all">
                 <em>All</em>
               </MenuItem>
               {ACHIEVEMENT_CATEGORIES.map((cat) => (
@@ -144,7 +138,7 @@ function AchievementToolbar() {
             value={dateRange}
             onChange={handleDateRangeChange}
             disableFuture
-            format='DD/MM/YYYY'
+            format="DD/MM/YYYY"
             slotProps={{
               textField: {
                 size: 'small',
@@ -157,9 +151,8 @@ function AchievementToolbar() {
         </Stack>
 
         <Box sx={{ paddingTop: 5 }}>
-
           <Slider
-            color='success'
+            color="success"
             value={localProgressRange}
             onChange={(_, newValue) => setLocalProgressRange(newValue as [number, number])}
             valueLabelDisplay="on"
@@ -168,14 +161,14 @@ function AchievementToolbar() {
             max={100}
             step={10}
           />
-          <Typography variant="body2" gutterBottom color='text.secondary'>
+          <Typography variant="body2" gutterBottom color="text.secondary">
             Progress
           </Typography>
         </Box>
 
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           <Button
-          color='primary'
+            color="primary"
             variant="outlined"
             onClick={handleReset}
             sx={{
@@ -201,4 +194,4 @@ function AchievementToolbar() {
   )
 }
 
-export default AchievementToolbar
+export default memo(AchievementToolbar)

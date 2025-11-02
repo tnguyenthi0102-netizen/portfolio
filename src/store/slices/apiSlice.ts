@@ -33,5 +33,3 @@ const apiSlice = createSlice({
 
 export const { apiErrorReceived, clearApiError } = apiSlice.actions
 export default apiSlice.reducer
-
-

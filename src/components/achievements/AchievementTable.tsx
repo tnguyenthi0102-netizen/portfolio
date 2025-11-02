@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { format } from 'date-fns'
 import {
   Table,
@@ -25,8 +25,9 @@ import CheckIcon from '@mui/icons-material/Check'
 import CancelIcon from '@mui/icons-material/Cancel'
 import AddIcon from '@mui/icons-material/Add'
 import type { Achievement } from '@/data/achievement'
-import { updateAchievement, deleteAchievement } from '@/services/achievements'
 import { toast } from 'sonner'
+import { useAppDispatch, useAppSelector } from '@/store'
+import { updateAchievementThunk, deleteAchievementThunk } from '@/store/slices/achievementsSlice'
 import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { areValuesEqual, filterValidTodos } from '@/utils/achievement'
@@ -34,7 +35,6 @@ import TodoItemRow from './TodoItemRow'
 
 interface AchievementTableProps {
   achievements: Achievement[]
-  onRefresh: () => void
   onEdit: (achievement: Achievement) => void
 }
 
@@ -47,13 +47,18 @@ const textTwoLineStyle = {
   wordBreak: 'break-word' as const,
 }
 
-function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableProps) {
+function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
+  const dispatch = useAppDispatch()
+  const { deleting } = useAppSelector((state) => state.achievements)
+
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingData, setEditingData] = useState<Partial<Achievement>>({})
   const [initialData, setInitialData] = useState<Partial<Achievement> | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
-  const [todosMenuAnchor, setTodosMenuAnchor] = useState<{ id: string; element: HTMLElement } | null>(null)
+  const [todosMenuAnchor, setTodosMenuAnchor] = useState<{
+    id: string
+    element: HTMLElement
+  } | null>(null)
 
   const handleStartEdit = (achievement: Achievement) => {
     setEditingId(achievement.id)
@@ -70,31 +75,29 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
 
   const handleToggleTodo = (todoId: number) => {
     if (!editingData.todos) return
-    const updatedTodos = editingData.todos.map(todo =>
-      todo.id === todoId ? { ...todo, done: !todo.done } : todo
+    const updatedTodos = editingData.todos.map((todo) =>
+      todo.id === todoId ? { ...todo, done: !todo.done } : todo,
     )
     setEditingData({ ...editingData, todos: updatedTodos })
   }
 
   const handleAddTodo = () => {
     const currentTodos = editingData.todos || []
-    const newId = currentTodos.length > 0
-      ? Math.max(...currentTodos.map(t => t.id)) + 1
-      : 1
+    const newId = currentTodos.length > 0 ? Math.max(...currentTodos.map((t) => t.id)) + 1 : 1
     const newTodos = [...currentTodos, { id: newId, title: '', done: false }]
     setEditingData({ ...editingData, todos: newTodos })
   }
 
   const handleRemoveTodo = (todoId: number) => {
     if (!editingData.todos) return
-    const updatedTodos = editingData.todos.filter(todo => todo.id !== todoId)
+    const updatedTodos = editingData.todos.filter((todo) => todo.id !== todoId)
     setEditingData({ ...editingData, todos: updatedTodos })
   }
 
   const handleUpdateTodoTitle = (todoId: number, title: string) => {
     if (!editingData.todos) return
-    const updatedTodos = editingData.todos.map(todo =>
-      todo.id === todoId ? { ...todo, title } : todo
+    const updatedTodos = editingData.todos.map((todo) =>
+      todo.id === todoId ? { ...todo, title } : todo,
     )
     setEditingData({ ...editingData, todos: updatedTodos })
   }
@@ -113,37 +116,36 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
     }
 
     try {
-      await updateAchievement(editingId, {
-        title: editingData.title,
-        description: editingData.description,
-        category: editingData.category,
-        todos: editingData.todos ? filterValidTodos(editingData.todos) : undefined,
-      })
+      await dispatch(
+        updateAchievementThunk({
+          id: editingId,
+          input: {
+            title: editingData.title,
+            description: editingData.description,
+            category: editingData.category,
+            todos: editingData.todos ? filterValidTodos(editingData.todos) : undefined,
+          },
+        }),
+      ).unwrap()
+
       toast.success('Achievement updated successfully')
       setEditingId(null)
       setEditingData({})
       setInitialData(null)
       setTodosMenuAnchor(null)
-      onRefresh()
-    } catch (error) {
-      toast.error('Failed to update achievement')
-      console.error(error)
+    } catch (error: any) {
+      toast.error(error || 'Failed to update achievement')
     }
   }
 
   const handleConfirmDelete = async () => {
     if (!confirmingId) return
     try {
-      setDeletingId(confirmingId)
-      await deleteAchievement(confirmingId)
+      await dispatch(deleteAchievementThunk(confirmingId)).unwrap()
       toast.success('Achievement deleted successfully')
-      onRefresh()
       setConfirmingId(null)
-    } catch (error) {
-      toast.error('Failed to delete achievement')
-      console.error(error)
-    } finally {
-      setDeletingId(null)
+    } catch (error: any) {
+      toast.error(error || 'Failed to delete achievement')
     }
   }
 
@@ -165,7 +167,6 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
               <TableCell>Title</TableCell>
               <TableCell>Description</TableCell>
               <TableCell>Category</TableCell>
@@ -176,168 +177,192 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.isArray(achievements) && achievements.map((achievement) => {
-              const isEditing = editingId === achievement.id
-              const isDeleting = deletingId === achievement.id
+            {Array.isArray(achievements) &&
+              achievements.map((achievement) => {
+                const isEditing = editingId === achievement.id
+                const isDeleting = deleting[achievement.id] || false
 
-              return (
-                <TableRow key={achievement.id} hover>
-                  <TableCell>{achievement.id}</TableCell>
-                  <TableCell>
-                    {isEditing ? (
-                      <TextField
-                        size="small"
-                        value={editingData.title || ''}
-                        onChange={(e) => setEditingData({ ...editingData, title: e.target.value })}
-                        fullWidth
-                      />
-                    ) : (
-                      <Typography variant="body2" sx={textTwoLineStyle}>
-                        {achievement.title}
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {isEditing ? (
-                      <TextField
-                        size="small"
-                        value={editingData.description || ''}
-                        onChange={(e) => setEditingData({ ...editingData, description: e.target.value })}
-                        fullWidth
-                        multiline
-                        maxRows={2}
-                      />
-                    ) : (
-                      <Typography variant="body2" sx={textTwoLineStyle}>
-                        {achievement.description}
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {isEditing ? (
-                      <Select
-                        value={editingData.category || ''}
-                        onChange={(e) => setEditingData({ ...editingData, category: e.target.value })}
-                        size="small"
-                        fullWidth
-                      >
-                        {ACHIEVEMENT_CATEGORIES.map((cat) => (
-                          <MenuItem key={cat} value={cat}>
-                            {cat}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    ) : (
-                      <Typography variant="body2">{achievement.category}</Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {isEditing ? (
-                      <Box>
+                return (
+                  <TableRow key={achievement.id} hover>
+                    <TableCell>
+                      {isEditing ? (
                         <TextField
                           size="small"
-                          value={editingData.todos?.length ? `${editingData.todos.length} todos` : 'No todos'}
-                          onClick={(e) => setTodosMenuAnchor({ id: achievement.id, element: e.currentTarget })}
-                          placeholder="Todo title"
+                          value={editingData.title || ''}
+                          onChange={(e) =>
+                            setEditingData({ ...editingData, title: e.target.value })
+                          }
                           fullWidth
-                          onChange={() => { }}
                         />
-                        
-                        <Menu
-                          anchorEl={todosMenuAnchor?.id === achievement.id ? todosMenuAnchor.element : null}
-                          open={Boolean(todosMenuAnchor?.id === achievement.id)}
-                          onClose={() => setTodosMenuAnchor(null)}
-                          PaperProps={{
-                            sx: { maxHeight: 300, width: 300, mt: 1 }
-                          }}
-                        >
-                          {editingData.todos && editingData.todos.length > 0 ? (
-                            editingData.todos.map((todo) => (
-                              <TodoItemRow
-                                key={todo.id}
-                                mode="controlled"
-                                todo={todo}
-                                onToggle={handleToggleTodo}
-                                onTitleChange={handleUpdateTodoTitle}
-                                onRemove={handleRemoveTodo}
-                                variant="menu"
-                              />
-                            ))
-                          ) : (
-                            <MenuItem disabled>No todos</MenuItem>
-                          )}
-                          <MenuItem
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleAddTodo()
-                            }}
-                            sx={{ borderTop: 1, borderColor: 'divider' }}
-                          >
-                            <AddIcon fontSize="small" sx={{ mr: 1 }} />
-                            Add Todo
-                          </MenuItem>
-                        </Menu>
-                      </Box>
-                    ) : (
-                      <Slider
-                        value={achievement.progress ?? 0}
-                        color='success'
-                        size='small'
-                        disabled
-                        valueLabelDisplay='on'
-                        valueLabelFormat={(value) => `${value}%`}
-                        sx={{
-                          '& .MuiSlider-valueLabel': {
-                            fontSize: '0.65rem',
-                            padding: '2px 4px',
-                          },
-                        }}
-                      />
-                    )}
-                  </TableCell>
-                  
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDate(achievement.createdAt)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDate(achievement.updatedAt)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    {isEditing ? (
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                        <IconButton size="small" color="success" onClick={handleSaveEdit}>
-                          <CheckIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton size="small" onClick={handleCancelEdit}>
-                          <CancelIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    ) : (
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                        <IconButton size="small" onClick={() => handleStartEdit(achievement)}>
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
+                      ) : (
+                        <Typography variant="body2" sx={textTwoLineStyle}>
+                          {achievement.title}
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {isEditing ? (
+                        <TextField
                           size="small"
-                          color="error"
-                          onClick={() => setConfirmingId(achievement.id)}
-                          disabled={isDeleting}
+                          value={editingData.description || ''}
+                          onChange={(e) =>
+                            setEditingData({ ...editingData, description: e.target.value })
+                          }
+                          fullWidth
+                          multiline
+                          maxRows={2}
+                        />
+                      ) : (
+                        <Typography variant="body2" sx={textTwoLineStyle}>
+                          {achievement.description}
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {isEditing ? (
+                        <Select
+                          value={editingData.category || ''}
+                          onChange={(e) =>
+                            setEditingData({ ...editingData, category: e.target.value })
+                          }
+                          size="small"
+                          fullWidth
                         >
-                          {isDeleting ? <CircularProgress size={16} /> : <DeleteIcon fontSize="small" />}
-                        </IconButton>
-                        <IconButton size="small" color="success" onClick={() => onEdit(achievement)}>
-                          <DialogIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    )}
-                  </TableCell>
-                </TableRow>
-              )
-            })}
+                          {ACHIEVEMENT_CATEGORIES.map((cat) => (
+                            <MenuItem key={cat} value={cat}>
+                              {cat}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      ) : (
+                        <Typography variant="body2">{achievement.category}</Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {isEditing ? (
+                        <Box>
+                          <TextField
+                            size="small"
+                            value={
+                              editingData.todos?.length
+                                ? `${editingData.todos.length} todos`
+                                : 'No todos'
+                            }
+                            onClick={(e) =>
+                              setTodosMenuAnchor({ id: achievement.id, element: e.currentTarget })
+                            }
+                            placeholder="Todo title"
+                            fullWidth
+                            onChange={() => {}}
+                          />
+
+                          <Menu
+                            anchorEl={
+                              todosMenuAnchor?.id === achievement.id
+                                ? todosMenuAnchor.element
+                                : null
+                            }
+                            open={Boolean(todosMenuAnchor?.id === achievement.id)}
+                            onClose={() => setTodosMenuAnchor(null)}
+                            PaperProps={{
+                              sx: { maxHeight: 300, width: 300, mt: 1 },
+                            }}
+                          >
+                            {editingData.todos && editingData.todos.length > 0 ? (
+                              editingData.todos.map((todo) => (
+                                <TodoItemRow
+                                  key={todo.id}
+                                  mode="controlled"
+                                  todo={todo}
+                                  onToggle={handleToggleTodo}
+                                  onTitleChange={handleUpdateTodoTitle}
+                                  onRemove={handleRemoveTodo}
+                                  variant="menu"
+                                />
+                              ))
+                            ) : (
+                              <MenuItem disabled>No todos</MenuItem>
+                            )}
+                            <MenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleAddTodo()
+                              }}
+                              sx={{ borderTop: 1, borderColor: 'divider' }}
+                            >
+                              <AddIcon fontSize="small" sx={{ mr: 1 }} />
+                              Add Todo
+                            </MenuItem>
+                          </Menu>
+                        </Box>
+                      ) : (
+                        <Slider
+                          value={achievement.progress ?? 0}
+                          color="success"
+                          size="small"
+                          disabled
+                          valueLabelDisplay="on"
+                          valueLabelFormat={(value) => `${value}%`}
+                          sx={{
+                            '& .MuiSlider-valueLabel': {
+                              fontSize: '0.65rem',
+                              padding: '2px 4px',
+                            },
+                          }}
+                        />
+                      )}
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatDate(achievement.createdAt)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatDate(achievement.updatedAt)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      {isEditing ? (
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                          <IconButton size="small" color="success" onClick={handleSaveEdit}>
+                            <CheckIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton size="small" onClick={handleCancelEdit}>
+                            <CancelIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ) : (
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                          <IconButton size="small" onClick={() => handleStartEdit(achievement)}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => setConfirmingId(achievement.id)}
+                            disabled={isDeleting}
+                          >
+                            {isDeleting ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              <DeleteIcon fontSize="small" />
+                            )}
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            color="success"
+                            onClick={() => onEdit(achievement)}
+                          >
+                            <DialogIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -349,10 +374,10 @@ function AchievementTable({ achievements, onRefresh, onEdit }: AchievementTableP
         cancelText="Cancel"
         onConfirm={handleConfirmDelete}
         onClose={() => setConfirmingId(null)}
-        loading={Boolean(deletingId)}
+        loading={confirmingId ? deleting[confirmingId] || false : false}
       />
     </>
   )
 }
 
-export default AchievementTable
+export default memo(AchievementTable)

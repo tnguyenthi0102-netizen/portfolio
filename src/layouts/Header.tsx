@@ -1,6 +1,6 @@
 import { clsx } from 'clsx'
 import { links } from '@/data/portfolio'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import ThemeToggle from '@/components/ThemeToggle'
 
@@ -26,7 +26,9 @@ function Header() {
         if (element) {
           const { offsetTop, offsetHeight } = element
           if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(section === 'home' ? 'Home' : section.charAt(0).toUpperCase() + section.slice(1))
+            setActiveSection(
+              section === 'home' ? 'Home' : section.charAt(0).toUpperCase() + section.slice(1),
+            )
             break
           }
         }
@@ -42,15 +44,19 @@ function Header() {
       setActiveSection('Achievements')
     } else if (location.pathname === '/' && location.state?.scrollTo) {
       const sectionId = location.state.scrollTo
-      const sectionName = sectionId === 'home' ? 'Home' : sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
+      const sectionName =
+        sectionId === 'home' ? 'Home' : sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
       setActiveSection(sectionName)
     }
   }, [location.pathname, location.state])
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: typeof links[number]) => {
+  const handleLinkClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    link: (typeof links)[number],
+  ) => {
     e.preventDefault()
     setActiveSection(link.name)
-    
+
     if (!isLandingPage) {
       navigate('/', { state: { scrollTo: link.hash.slice(1) } })
     } else {
@@ -70,8 +76,10 @@ function Header() {
 
   return (
     <header className="z-[999] relative">
-      <nav className={`flex fixed left-1/2 -translate-x-1/2 z-50 transition-transform duration-300 ${isScrolled ? 'top-0 md:top-0 -translate-y-2' : 'top-4 md:top-6'}`}>
-        <div className="bg-[var(--color-bg)] rounded-full px-3 py-1.5 md:px-5 md:py-2.5 shadow-2xl border border-white/10 border-black/10 max-w-[90vw] overflow-x-auto">
+      <nav
+        className={`flex fixed left-1/2 -translate-x-1/2 z-50 transition-transform duration-300 ${isScrolled ? 'top-2 md:top-2 -translate-y-2' : 'top-4 md:top-6'}`}
+      >
+        <div className="bg-[var(--color-bg)] rounded-full px-3 py-1.5 md:px-5 md:py-2.5 shadow-2xl border border-white/10 border-black/10 max-w-[calc(90vw-3rem)] overflow-x-auto">
           <ul className="flex items-center justify-center gap-3 md:gap-6 list-none whitespace-nowrap">
             {links.map((link) => {
               const isActive = activeSection === link.name
@@ -82,7 +90,7 @@ function Header() {
                       'relative px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-normal text-gray-400 transition-all duration-200 block cursor-pointer',
                       {
                         'hover:text-gray-300': !isActive,
-                      }
+                      },
                     )}
                     href={link.hash}
                     onClick={(e) => handleLinkClick(e, link)}
@@ -101,7 +109,7 @@ function Header() {
                   'relative px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-normal text-gray-400 transition-all duration-200 block cursor-pointer',
                   {
                     'hover:text-gray-300': activeSection !== 'Achievements',
-                  }
+                  },
                 )}
                 href="/achievements"
                 onClick={handleAchievementsClick}
@@ -122,4 +130,4 @@ function Header() {
   )
 }
 
-export default Header
+export default memo(Header)

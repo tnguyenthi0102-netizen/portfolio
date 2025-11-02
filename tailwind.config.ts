@@ -3,11 +3,7 @@ import { themeConfig } from './src/theme'
 
 const config: Config = {
   darkMode: 'class',
-  content: [
-    './index.html',
-    './src/**/*.{js,jsx,ts,tsx}',
-    './src/**/*.css',
-  ],
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}', './src/**/*.css'],
   theme: {
     extend: {
       keyframes: {
@@ -26,4 +22,3 @@ const config: Config = {
 }
 
 export default config
-

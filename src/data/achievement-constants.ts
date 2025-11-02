@@ -17,4 +17,3 @@ export const ACHIEVEMENT_STATUSES = [
 
 export type AchievementCategory = (typeof ACHIEVEMENT_CATEGORIES)[number]
 export type AchievementStatus = (typeof ACHIEVEMENT_STATUSES)[number]
-

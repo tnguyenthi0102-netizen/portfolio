@@ -3,11 +3,11 @@ import { getColors, themeConfig } from './theme'
 
 export function getMuiTheme(isDark: boolean) {
   const colors = getColors(isDark)
-  
+
   return createTheme({
     palette: {
       mode: isDark ? 'dark' : 'light',
-      primary: { 
+      primary: {
         main: colors.bg,
       },
       error: {
@@ -58,7 +58,6 @@ export function getMuiTheme(isDark: boolean) {
             '&:hover .MuiOutlinedInput-notchedOutline': {
               borderColor: colors.border,
             },
-
           },
         },
       },
@@ -98,12 +97,9 @@ export function getMuiTheme(isDark: boolean) {
             '&.MuiPickersTextField-root .MuiPickersInputBase-root': {
               backgroundColor: colors.bg,
             },
-
           },
         },
       },
-      
     },
   })
 }
-

@@ -19,7 +19,7 @@ type FontSizeTokens = {
   '4xl': string
 }
 
-const lightColors= {
+const lightColors = {
   bg: '#fefefe',
   fg: '#1f2937',
   cardBg: '#ffffff',
@@ -62,7 +62,10 @@ export function applyColorsToCSSVariables(mode: 'light' | 'dark'): void {
   if (typeof document === 'undefined') return
   const colors = themeConfig[mode]
   Object.entries(colors).forEach(([k, v]) =>
-    document.documentElement.style.setProperty(`--color-${k.replace(/([A-Z])/g, '-$1').toLowerCase()}`, v)
+    document.documentElement.style.setProperty(
+      `--color-${k.replace(/([A-Z])/g, '-$1').toLowerCase()}`,
+      v,
+    ),
   )
 }
 
@@ -71,11 +74,16 @@ export type ThemeMode = 'light' | 'dark' | 'system'
 const STORAGE_KEY = 'theme-preference'
 
 function getSystemPrefersDark(): boolean {
-  return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  )
 }
 
 export function getPreferredTheme(): ThemeMode {
-  const saved = typeof window !== 'undefined' ? (localStorage.getItem(STORAGE_KEY) as ThemeMode | null) : null
+  const saved =
+    typeof window !== 'undefined' ? (localStorage.getItem(STORAGE_KEY) as ThemeMode | null) : null
   return saved ?? 'system'
 }
 
@@ -124,7 +132,7 @@ export const themeConfig = {
     accent: darkColors.accent,
     accentFg: darkColors.accentFg,
   },
-  
+
   fontSize: {
     xs: fontSizes.xs,
     sm: fontSizes.sm,
@@ -136,5 +144,3 @@ export const themeConfig = {
     '4xl': fontSizes['4xl'],
   },
 }
-
-

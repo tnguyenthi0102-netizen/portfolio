@@ -30,10 +30,7 @@ function ContactSection() {
   }
 
   return (
-    <section
-      id="contact"
-      className="mb-20 sm:mb-28 w-[min(100%,38rem)] text-center"
-    >
+    <section id="contact" className="mb-20 sm:mb-28 w-[min(100%,38rem)] text-center">
       <h2 className="text-[--text-3xl] font-medium capitalize mb-8 text-center">Contact me</h2>
 
       <p className="text-gray-700 -mt-6 text-[var(--text-base)] mb-10">

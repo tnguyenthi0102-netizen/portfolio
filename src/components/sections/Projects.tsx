@@ -42,7 +42,7 @@ function ProjectCard({ project, index }: ProjectCardProps) {
           <p className="text-sm sm:text-base text-[var(--color-muted)] leading-relaxed flex-1 p-5">
             {project.description}
           </p>
-          
+
           {/* Technology Tags */}
           <div className="flex flex-wrap gap-2">
             {project.tags.map((tag: string, i: number) => (
@@ -57,7 +57,12 @@ function ProjectCard({ project, index }: ProjectCardProps) {
         </div>
 
         {/* Right Section - Image */}
-        <div className={cn('relative sm:w-96 sm:min-w-96 h-64 sm:max-h-96 mt-4 sm:mt-0 flex items-center justify-center overflow-hidden rounded-lg', reverse ? 'sm:mr-6' : 'sm:ml-6')}>
+        <div
+          className={cn(
+            'relative sm:w-96 sm:min-w-96 h-64 sm:max-h-96 mt-4 sm:mt-0 flex items-center justify-center overflow-hidden rounded-lg',
+            reverse ? 'sm:mr-6' : 'sm:ml-6',
+          )}
+        >
           <div className="relative w-full h-full max-h-64 sm:max-h-96 flex items-center justify-center rounded-lg">
             <img
               src={project.imageUrl || 'https://via.placeholder.com/600x400'}
