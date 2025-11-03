@@ -1,5 +1,4 @@
 import emailjs from '@emailjs/browser'
-import { validateString } from '../utils/errorMessages'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || ''
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || ''
@@ -13,16 +12,6 @@ if (EMAILJS_PUBLIC_KEY) {
 }
 
 export const sendEmail = async (senderEmail: string, message: string) => {
-  if (!validateString(senderEmail, 500)) {
-    return {
-      error: 'Invalid sender email',
-    }
-  }
-  if (!validateString(message, 5000)) {
-    return {
-      error: 'Invalid message',
-    }
-  }
 
   if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
     return {

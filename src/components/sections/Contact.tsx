@@ -1,31 +1,45 @@
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { sendEmail } from '@/services/contact'
+import { contactSchema, type ContactFormData } from '@/utils/contact'
+
 const SUCCESS_DURATION = 3000
 
 function ContactSection() {
-  const [senderEmail, setSenderEmail] = useState('')
-  const [message, setMessage] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+  })
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const onSubmit = async (data: ContactFormData) => {
+    const validationResult = contactSchema.safeParse({
+      senderEmail: data.senderEmail,
+      message: data.message,
+    })
 
+    if (!validationResult.success) {
+     
+      toast.error(validationResult.error.issues[0].message)
+      return
+    }
+
+ 
     try {
-      const result = await sendEmail(senderEmail, message)
+      const result = await sendEmail(data.senderEmail, data.message)
 
       if (result.error) {
         toast.error(result.error)
       } else {
         toast.success('Email sent successfully!', { duration: SUCCESS_DURATION })
-        setSenderEmail('')
-        setMessage('')
+        reset()
       }
     } catch {
       toast.error('Failed to send email')
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -41,26 +55,26 @@ function ContactSection() {
         or through this form.
       </p>
 
-      <form className="mt-10 flex flex-col dark:text-black" onSubmit={handleSubmit}>
+      <form className="mt-10 flex flex-col dark:text-black" onSubmit={handleSubmit(onSubmit)}>
         <input
           className="h-14 px-4 rounded-lg border border-black/10 dark:bg-white dark:bg-opacity-80 dark:focus:bg-opacity-100 transition-all dark:outline-none focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/50"
           type="email"
-          required
-          maxLength={500}
           placeholder="Your email"
-          value={senderEmail}
-          onChange={(e) => setSenderEmail(e.target.value)}
+          {...register('senderEmail')}
           disabled={isSubmitting}
         />
+        {errors.senderEmail && (
+          <p className="text-red-500 text-sm mt-1 text-left">{errors.senderEmail.message}</p>
+        )}
         <textarea
           className="h-52 my-3 rounded-lg border border-black/10 p-4 dark:bg-white dark:bg-opacity-80 dark:focus:bg-opacity-100 transition-all dark:outline-none focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/50"
           placeholder="Your message"
-          required
-          maxLength={5000}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          {...register('message')}
           disabled={isSubmitting}
         />
+        {errors.message && (
+          <p className="text-red-500 text-sm mt-1 text-left">{errors.message.message}</p>
+        )}
         <button
           type="submit"
           disabled={isSubmitting}
