@@ -11,6 +11,7 @@ interface TodoItemRowControlledProps {
   onRemove: (todoId: number) => void
   variant?: 'menu' | 'form'
   mode: 'controlled'
+  error?: string
 }
 
 interface TodoItemRowFormProps {
@@ -30,10 +31,10 @@ function TodoItemRow(props: TodoItemRowProps) {
   const isMenuVariant = variant === 'menu'
 
   if (props.mode === 'controlled') {
-    const { todo, onToggle, onTitleChange, onRemove } = props
+    const { todo, onToggle, onTitleChange, onRemove, error } = props
 
     const content = (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
         <Checkbox
           checked={todo.done}
           onChange={() => onToggle(todo.id)}
@@ -46,6 +47,8 @@ function TodoItemRow(props: TodoItemRowProps) {
           onChange={(e) => onTitleChange(todo.id, e.target.value)}
           placeholder="Todo title"
           fullWidth
+          error={!!error}
+          helperText={error}
           onClick={(e) => e.stopPropagation()}
         />
         <IconButton

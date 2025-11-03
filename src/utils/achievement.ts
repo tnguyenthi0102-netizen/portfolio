@@ -3,7 +3,7 @@ import type { TodoItem } from '@/data/achievement'
 
 export const todoItemSchema = z.object({
   id: z.union([z.string(), z.number()]).optional(),
-  title: z.string().min(1, 'Todo title is required'),
+  title: z.string().max(50, 'Todo title is too long'),
   done: z.boolean(),
 })
 

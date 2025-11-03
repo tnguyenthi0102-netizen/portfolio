@@ -17,6 +17,8 @@ import {
   CircularProgress,
   Menu,
   Slider,
+  FormControl,
+  FormHelperText,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -30,7 +32,7 @@ import { useAppDispatch, useAppSelector } from '@/store'
 import { updateAchievementThunk, deleteAchievementThunk } from '@/store/slices/achievementsSlice'
 import { ACHIEVEMENT_CATEGORIES } from '@/data/achievement-constants'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-import { areValuesEqual, filterValidTodos } from '@/utils/achievement'
+import { areValuesEqual, filterValidTodos, achievementSchema } from '@/utils/achievement'
 import TodoItemRow from './TodoItemRow'
 
 interface AchievementTableProps {
@@ -55,6 +57,7 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
   const [editingData, setEditingData] = useState<Partial<Achievement>>({})
   const [initialData, setInitialData] = useState<Partial<Achievement> | null>(null)
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   const [todosMenuAnchor, setTodosMenuAnchor] = useState<{
     id: string
     element: HTMLElement
@@ -64,12 +67,14 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
     setEditingId(achievement.id)
     setEditingData({ ...achievement })
     setInitialData({ ...achievement })
+    setValidationErrors({})
   }
 
   const handleCancelEdit = () => {
     setEditingId(null)
     setEditingData({})
     setInitialData(null)
+    setValidationErrors({})
     setTodosMenuAnchor(null)
   }
 
@@ -111,9 +116,43 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
       setEditingId(null)
       setEditingData({})
       setInitialData(null)
+      setValidationErrors({})
       setTodosMenuAnchor(null)
       return
     }
+
+    const dataToValidate = {
+      title: editingData.title || '',
+      description: editingData.description || '',
+      category: editingData.category || '',
+      todos: editingData.todos || [],
+    }
+
+    const result = achievementSchema.safeParse(dataToValidate)
+    console.log(result)
+
+    if (!result.success) {
+      const errors: Record<string, string> = {}
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string
+        if (field === 'todos' && issue.path.length > 1) {
+          const todoIndex = issue.path[1] as number
+          const todoField = issue.path[2] as string | undefined
+          if (todoField) {
+            if (!errors[`todos.${todoIndex}.${todoField}`]) {
+              errors[`todos.${todoIndex}.${todoField}`] = issue.message
+            }
+          }
+        } else if (field) {
+          errors[field] = issue.message
+        }
+      })
+      setValidationErrors(errors)
+      toast.error('Please fix validation errors')
+      return
+    }
+
+    setValidationErrors({})
 
     try {
       await dispatch(
@@ -184,7 +223,12 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
 
                 return (
                   <TableRow key={achievement.id} hover>
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        position: 'relative',
+                        paddingBottom: isEditing ? 3 : 'inherit',
+                      }}
+                    >
                       {isEditing ? (
                         <TextField
                           size="small"
@@ -193,6 +237,18 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
                             setEditingData({ ...editingData, title: e.target.value })
                           }
                           fullWidth
+                          error={!!validationErrors.title}
+                          FormHelperTextProps={{
+                            sx: {
+                              margin: 0,
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              fontSize: '0.75rem',
+                              whiteSpace: 'nowrap',
+                            },
+                          }}
+                          helperText={validationErrors.title}
                         />
                       ) : (
                         <Typography variant="body2" sx={textTwoLineStyle}>
@@ -200,7 +256,12 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
                         </Typography>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        position: 'relative',
+                        paddingBottom: isEditing ? 3 : 'inherit',
+                      }}
+                    >
                       {isEditing ? (
                         <TextField
                           size="small"
@@ -211,6 +272,18 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
                           fullWidth
                           multiline
                           maxRows={2}
+                          error={!!validationErrors.description}
+                          FormHelperTextProps={{
+                            sx: {
+                              margin: 0,
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              fontSize: '0.75rem',
+                              whiteSpace: 'nowrap',
+                            },
+                          }}
+                          helperText={validationErrors.description}
                         />
                       ) : (
                         <Typography variant="body2" sx={textTwoLineStyle}>
@@ -218,22 +291,44 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
                         </Typography>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        position: 'relative',
+                        paddingBottom: isEditing ? 3 : 'inherit',
+                      }}
+                    >
                       {isEditing ? (
-                        <Select
-                          value={editingData.category || ''}
-                          onChange={(e) =>
-                            setEditingData({ ...editingData, category: e.target.value })
-                          }
-                          size="small"
-                          fullWidth
-                        >
-                          {ACHIEVEMENT_CATEGORIES.map((cat) => (
-                            <MenuItem key={cat} value={cat}>
-                              {cat}
-                            </MenuItem>
-                          ))}
-                        </Select>
+                        <>
+                          <FormControl size="small" fullWidth error={!!validationErrors.category}>
+                            <Select
+                              value={editingData.category || ''}
+                              onChange={(e) =>
+                                setEditingData({ ...editingData, category: e.target.value })
+                              }
+                              fullWidth
+                            >
+                              {ACHIEVEMENT_CATEGORIES.map((cat) => (
+                                <MenuItem key={cat} value={cat}>
+                                  {cat}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          {validationErrors.category && (
+                            <FormHelperText
+                              sx={{
+                                margin: 0,
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                fontSize: '0.75rem',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {validationErrors.category}
+                            </FormHelperText>
+                          )}
+                        </>
                       ) : (
                         <Typography variant="body2">{achievement.category}</Typography>
                       )}
@@ -269,7 +364,7 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
                             }}
                           >
                             {editingData.todos && editingData.todos.length > 0 ? (
-                              editingData.todos.map((todo) => (
+                              editingData.todos.map((todo, index) => (
                                 <TodoItemRow
                                   key={todo.id}
                                   mode="controlled"
@@ -278,6 +373,7 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
                                   onTitleChange={handleUpdateTodoTitle}
                                   onRemove={handleRemoveTodo}
                                   variant="menu"
+                                  error={validationErrors[`todos.${index}.title`]}
                                 />
                               ))
                             ) : (
