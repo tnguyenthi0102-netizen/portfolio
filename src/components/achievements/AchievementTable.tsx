@@ -16,7 +16,6 @@ import {
   Typography,
   CircularProgress,
   Menu,
-  Slider,
   FormControl,
   FormHelperText,
 } from '@mui/material'
@@ -348,7 +347,7 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
                             }
                             placeholder="Todo title"
                             fullWidth
-                            onChange={() => {}}
+                            onChange={() => { }}
                           />
 
                           <Menu
@@ -392,20 +391,12 @@ function AchievementTable({ achievements, onEdit }: AchievementTableProps) {
                           </Menu>
                         </Box>
                       ) : (
-                        <Slider
-                          value={achievement.progress ?? 0}
-                          color="success"
-                          size="small"
-                          disabled
-                          valueLabelDisplay="on"
-                          valueLabelFormat={(value) => `${value}%`}
-                          sx={{
-                            '& .MuiSlider-valueLabel': {
-                              fontSize: '0.65rem',
-                              padding: '2px 4px',
-                            },
-                          }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Typography variant="body2">
+                            {achievement.progress ?? 0}% ·
+                          </Typography>
+                          <Typography variant="body2" color='text.secondary'>{achievement.todos?.length ?? 0} task{achievement.todos?.length !== 1 ? 's' : ''}</Typography>
+                        </Box>
                       )}
                     </TableCell>
 

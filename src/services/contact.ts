@@ -5,7 +5,6 @@ const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || ''
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || ''
 
 if (EMAILJS_PUBLIC_KEY) {
-  console.log('EMAILJS_PUBLIC_KEY', EMAILJS_PUBLIC_KEY)
   emailjs.init({
     publicKey: EMAILJS_PUBLIC_KEY,
   })
